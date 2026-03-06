@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactStrictMode: true,
+
+  // Next dev indikatorlarini o'chiradi
+  devIndicators: false,
 };
 
 export default nextConfig;

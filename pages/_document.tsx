@@ -8,7 +8,7 @@ export default function Document() {
         <meta name="title" content="Kiddo | Premium Kids Clothing Store" />
         <meta name="robots" content="index, follow" />
 
-        <link rel="icon" type="image/png" href="/logo/kiddo_logo.png" />
+        <link rel="icon" type="image/png" href="/img/logo/k_logo.svg" />
         {/*SEO */}
         <meta
           name="keywords"
