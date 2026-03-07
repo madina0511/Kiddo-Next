@@ -1,4 +1,5 @@
 import Brand from "@/libs/components/homepage/Brand";
+import BrandValues from "@/libs/components/homepage/BrandValue";
 import NewArrivals from "@/libs/components/homepage/NewArrivals";
 import ProductSwiper from "@/libs/components/homepage/ProductSwiper";
 import withLayoutMain from "@/libs/components/layout/LayoutHome";
@@ -11,6 +12,7 @@ const Home: NextPage = () => {
       <NewArrivals />
       <ProductSwiper />
       <Brand />
+      <BrandValues />
     </Stack>
   );
 };
