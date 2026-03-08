@@ -44,11 +44,11 @@ const Top = () => {
 
         {/* Desktop Menu */}
         <div className="desktopMenu">
-          <Link href="/">Home</Link>
           <MegaMenuPopper label="SHOP" />
-          <Link href="/Pairing">Pairing</Link>
+          <Link href="/sets">Sets</Link>
           <Link href="/brand">Brands</Link>
-          <Link href="/article">Thoughts</Link>
+          <Link href="/stories">Stories</Link>
+          <Link href="/sizeGuide">SizeGuide</Link>
           {user._id ? <Link href={"/mypage"}>My Page</Link> : null}
 
           <div className="searchBox">

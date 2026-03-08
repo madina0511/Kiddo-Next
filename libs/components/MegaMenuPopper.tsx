@@ -28,21 +28,20 @@ export default function MegaMenuPopper({ label = "SHOP", items }: Props) {
   const menuItems = useMemo<MegaItem[]>(
     () =>
       items ?? [
-        { title: "Outerwear", subtitle: "0–16 Years", href: "/shop/outerwear" },
-        { title: "Girl", subtitle: "2–16 Years", href: "/shop/girl" },
-        { title: "Boy", subtitle: "2–16 Years", href: "/shop/boy" },
+        { title: "Outerwear", subtitle: "0–16 Years", href: "/outerWear" },
+        { title: "Girl", subtitle: "2–16 Years", href: "/girl" },
+        { title: "Boy", subtitle: "2–16 Years", href: "/boy" },
         {
           title: "Accessories",
           subtitle: "0–16 Years",
-          href: "/shop/accessories",
+          href: "/accessories",
         },
         {
           title: "Baby & Toddler",
           subtitle: "0–4 years",
-          href: "/shop/baby-toddler",
+          href: "/baby_toddler",
         },
-        { title: "Swimwear", subtitle: "0–16 Years", href: "/shop/swimwear" },
-        { title: "Archive", subtitle: "up to 50% off", href: "/shop/archive" },
+        { title: "Swimwear", subtitle: "0–16 Years", href: "/swimwear" },
       ],
     [items],
   );

@@ -5,7 +5,7 @@ const NewArrivals = () => {
   return (
     <Stack className="new-arrivals">
       <div className="new-arrival">
-        <Link href="/newarrivals" className="text">
+        <Link href="/products" className="text">
           <h1>NEW ARRIVALS</h1>
         </Link>
       </div>
