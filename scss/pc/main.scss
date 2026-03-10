@@ -1,7 +1,8 @@
 /** IMPORTS **/
 @use "../variables" as *;
 @use "../reset";
-@use "../pc/homepage/homepage.scss"; // body {
+@use "../pc/homepage/homepage.scss";
+@use "../pc/products/product-Detail.scss"; // body {
 //   -ms-overflow-style: none; /* for Internet Explorer, Edge */
 //   scrollbar-width: none; /* for Firefox */
 //   overflow-y: scroll;

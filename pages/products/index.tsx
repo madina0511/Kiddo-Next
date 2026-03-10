@@ -19,39 +19,48 @@ const categories = [
 
 const Products = () => {
   const [openFilter, setOpenFilter] = useState(false);
+  const likeProductHandler = (productId: string) => {
+    console.log("Liked product:", productId);
+  };
 
   return (
     <div id="pc-wrap">
-      <Stack className={styles.productsWrap}>
-        <Box className={styles.categoryWrap}>
-          <Box className={styles.category}>
-            {categories.map((item) => (
-              <Link key={item} href="/dresses">
-                {item}
-              </Link>
+      <Stack>
+        <Stack className={styles.productsWrap}>
+          <Box className={styles.categoryWrap}>
+            <Box className={styles.category}>
+              {categories.map((item) => (
+                <Link key={item} href="/dresses">
+                  {item}
+                </Link>
+              ))}
+            </Box>
+
+            <Box className={styles.filterWrap}>
+              <Typography className={styles.productCount}>
+                ({products.length} products)
+              </Typography>
+
+              <Button
+                className={styles.filterBtn}
+                onClick={() => setOpenFilter(true)}>
+                FILTER
+              </Button>
+            </Box>
+          </Box>
+
+          <Box className={styles.productCards}>
+            {products.map((product) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                likeProductHandler={likeProductHandler}
+              />
             ))}
           </Box>
 
-          <Box className={styles.filterWrap}>
-            <Typography className={styles.productCount}>
-              ({products.length} products)
-            </Typography>
-
-            <Button
-              className={styles.filterBtn}
-              onClick={() => setOpenFilter(true)}>
-              FILTER
-            </Button>
-          </Box>
-        </Box>
-
-        <Box className={styles.productCards}>
-          {products.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </Box>
-
-        <Filter open={openFilter} onClose={() => setOpenFilter(false)} />
+          <Filter open={openFilter} onClose={() => setOpenFilter(false)} />
+        </Stack>
       </Stack>
     </div>
   );

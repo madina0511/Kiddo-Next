@@ -1,0 +1,130 @@
+#pc-wrap {
+  .container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 30px 20px;
+
+    .detail-wrap {
+      width: 100%;
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+
+      .img-wrap {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+
+        img {
+          width: calc(50% - 6px);
+          height: 420px;
+          object-fit: cover;
+          display: block;
+          background: #f7f7f7;
+        }
+      }
+
+      .info-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 24px;
+      }
+    }
+  }
+
+  .info-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .desc {
+      font-size: 16px;
+      color: #555;
+    }
+
+    .price {
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
+
+  .select-box {
+    width: 300px;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .cart-btn {
+    width: 300px;
+    height: 50px;
+    background: #111;
+    color: #fff;
+
+    &:hover {
+      background: #222;
+    }
+  }
+
+  .selected-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    p {
+      font-size: 15px;
+      color: #333;
+    }
+  }
+
+  .see-more-wrap {
+    width: 100%;
+    margin-top: 100px;
+    padding: 0 20px 80px;
+    box-sizing: border-box;
+
+    .see-more-title {
+      text-align: center;
+      font-size: 28px !important;
+      font-weight: 700 !important;
+      letter-spacing: 1px;
+      color: #111;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .see-more-brand {
+      text-align: center;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      color: #8a8a8a;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .see-more-card {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}

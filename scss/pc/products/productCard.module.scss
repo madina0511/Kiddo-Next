@@ -44,31 +44,37 @@
   opacity: 1;
   transform: scale(1.02);
 }
-
+.info_view {
+  display: flex;
+  flex-direction: row;
+  background-color: #666;
+}
 .info {
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding-top: 8px;
-}
+  .brand {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-.brand {
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  .title {
+    font-size: 14px;
+    font-weight: 400;
+    color: #111;
+    line-height: 1.4;
+  }
 
-.title {
-  font-size: 14px;
-  font-weight: 400;
-  color: #111;
-  line-height: 1.4;
+  .price {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111;
+  }
 }
-
-.price {
-  font-size: 14px;
-  font-weight: 500;
-  color: #111;
+.view_like {
+  display: flex;
 }
