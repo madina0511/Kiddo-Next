@@ -286,8 +286,8 @@ const ProductDetail = ({ initialComment, ...props }: any) => {
           </Stack>
         )}
         <Stack className={"leave-review-config"}>
-          <Typography className={"main-title"}>Leave A Review</Typography>
-          <Typography className={"review-title"}>Review</Typography>
+          <Typography className={"main-title"}>Leave Your Opinion</Typography>
+          <Typography className={"review-title"}>Opinion</Typography>
           <textarea
             onChange={({ target: { value } }: any) => {
               setInsertCommentData({

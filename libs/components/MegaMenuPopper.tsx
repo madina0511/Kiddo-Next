@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import {
   Box,
@@ -20,7 +21,8 @@ type Props = {
   items?: MegaItem[];
 };
 
-export default function MegaMenuPopper({ label = "SHOP", items }: Props) {
+export default function MegaMenuPopper({ label = "SHop", items }: Props) {
+  const router = useRouter();
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [open, setOpen] = useState(false);
@@ -28,9 +30,9 @@ export default function MegaMenuPopper({ label = "SHOP", items }: Props) {
   const menuItems = useMemo<MegaItem[]>(
     () =>
       items ?? [
-        { title: "Outerwear", subtitle: "0–16 Years", href: "/outerWear" },
-        { title: "Girl", subtitle: "2–16 Years", href: "/girl" },
-        { title: "Boy", subtitle: "2–16 Years", href: "/boy" },
+        { title: "OUTERWEAR", subtitle: "0–16 Years", href: "/outerWear" },
+        { title: "INDOOWEAR", subtitle: "2–16 Years", href: "/girl" },
+
         {
           title: "Accessories",
           subtitle: "0–16 Years",
@@ -45,7 +47,10 @@ export default function MegaMenuPopper({ label = "SHOP", items }: Props) {
       ],
     [items],
   );
-
+  // Handlers
+  const categoryClickHandler = (category: string) => {
+    router.push(`/products?category=${category}`);
+  };
   const handleOpen = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setOpen(true);
@@ -97,7 +102,11 @@ export default function MegaMenuPopper({ label = "SHOP", items }: Props) {
             }}>
             <Box className="megaGrid">
               {menuItems.map((it) => (
-                <Link key={it.href} href={it.href} className="megaItem">
+                <Box
+                  key={it.href}
+                  className="megaItem"
+                  onClick={() => categoryClickHandler(it.title)}
+                  sx={{ cursor: "pointer" }}>
                   <Stack spacing={0.5} alignItems="center">
                     <Typography className="megaTitle">{it.title}</Typography>
                     {it.subtitle ? (
@@ -106,7 +115,7 @@ export default function MegaMenuPopper({ label = "SHOP", items }: Props) {
                       </Typography>
                     ) : null}
                   </Stack>
-                </Link>
+                </Box>
               ))}
             </Box>
           </Paper>

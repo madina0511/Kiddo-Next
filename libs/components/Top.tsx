@@ -9,6 +9,7 @@ import Logout from "@mui/icons-material/Logout";
 import Link from "next/link";
 import { REACT_APP_API_URL } from "../types/config";
 import MegaMenuPopper from "./MegaMenuPopper";
+import BrandMenuPopper from "./brands/MegaMenuPopper";
 
 const Top = () => {
   const [open, setOpen] = useState(false);
@@ -46,7 +47,7 @@ const Top = () => {
         <div className="desktopMenu">
           <MegaMenuPopper label="SHOP" />
           <Link href="/sets">Sets</Link>
-          <Link href="/brand">Brands</Link>
+          <BrandMenuPopper label="Brands" />
           <Link href="/stories">Stories</Link>
           <Link href="/sizeGuide">SizeGuide</Link>
           {user._id ? <Link href={"/mypage"}>My Page</Link> : null}

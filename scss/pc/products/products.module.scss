@@ -68,3 +68,26 @@
   align-items: center;
   margin-bottom: 40px;
 }
+.paginationConfig {
+  width: 100%;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  .paginationBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+.totalResult {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    font-size: 14px;
+    color: #666;
+  }
+}

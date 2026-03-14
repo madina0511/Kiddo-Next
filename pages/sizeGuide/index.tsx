@@ -1,4 +1,4 @@
-import sizeGuideRows from "@/libs/common";
+import { sizeGuideRows } from "@/libs/common";
 import { Box, Container, Stack, Typography } from "@mui/material";
 export default function SizeGuidePage() {
   return (
