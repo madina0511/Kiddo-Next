@@ -21,7 +21,7 @@ type Props = {
   items?: MegaItem[];
 };
 
-export default function MegaMenuPopper({ label = "SHop", items }: Props) {
+export default function MegaMenuPopper({ label = "Shop", items }: Props) {
   const router = useRouter();
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

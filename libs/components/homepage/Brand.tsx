@@ -4,15 +4,17 @@ import {
 } from "@/libs/types/sweetAlert";
 import { Stack, Typography, TextField, Button } from "@mui/material";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 const brands = [
-  { name: "MOLO", image: "/img/brands/molo.jpg" },
-  { name: "COSMO", image: "/img/brands/cosmo.webp" },
-  { name: "NORALEE", image: "/img/brands/noralee.jpg" },
-  { name: "SWEEBIES", image: "/img/brands/sweebies.jpg" },
+  { name: "MOLO", image: "/img/brands/molo.jpg", slug: "molo" },
+  { name: "COSMO", image: "/img/brands/cosmo.webp", slug: "cosmo" },
+  { name: "NORALEE", image: "/img/brands/noralee.jpg", slug: "noralee" },
+  { name: "SWEEBIES", image: "/img/brands/sweebies.jpg", slug: "sweebies" },
 ];
 
 const Brand = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
 
   const handleSubmit = async () => {
@@ -20,7 +22,6 @@ const Brand = () => {
       await sweetErrorAlert("Please enter your email");
       return;
     }
-
     await sweetMixinSuccessAlert("Your email has been submitted successfully!");
     setEmail("");
   };
@@ -31,9 +32,12 @@ const Brand = () => {
 
       <Stack className="brand-wrap">
         {brands.map((brand) => (
-          <Stack className="brand-card" key={brand.name}>
+          <Stack
+            className="brand-card"
+            key={brand.name}
+            onClick={() => router.push(`/brand/${brand.slug}`)} // ✅ click handler
+            sx={{ cursor: "pointer" }}>
             <img src={brand.image} alt={brand.name} className="brand-image" />
-
             <Stack className="brand-overlay">
               <h3>{brand.name}</h3>
             </Stack>
@@ -45,7 +49,6 @@ const Brand = () => {
         <Typography className="brand-contact-text">
           BECOME A PARTNER BRAND WITH US
         </Typography>
-
         <Stack className="email-box">
           <TextField
             size="small"
@@ -55,7 +58,6 @@ const Brand = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="brand-input"
           />
-
           <Button
             variant="contained"
             onClick={handleSubmit}

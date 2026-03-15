@@ -5,6 +5,9 @@
 @use "../pc/layout/BaseTop.scss";
 @use "../pc/homepage/homepage.scss";
 @use "../pc/brand/detail.scss";
+@use "../pc/sets/sets.scss";
+@use "../pc/sets/set-detail.scss";
+
 @use "../pc/products/product-Detail.scss"; // body {
 //   -ms-overflow-style: none; /* for Internet Explorer, Edge */
 //   scrollbar-width: none; /* for Firefox */
@@ -174,5 +177,20 @@
         }
       }
     }
+  }
+}
+.no-data {
+  padding: 30px 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  img {
+    width: 56px;
+    margin-bottom: 2px;
+  }
+  p {
+    color: #bdbdbd;
+    text-align: center;
   }
 }

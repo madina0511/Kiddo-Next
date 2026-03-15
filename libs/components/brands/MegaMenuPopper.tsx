@@ -89,13 +89,13 @@ export default function BrandMenuPopper({ label = "Brands" }: Props) {
             <Box className="megaGrid">
               {brands.map((brand) => (
                 <Box
-                  key={brand._id} // ✅ unique key
+                  key={brand._id}
                   className="megaItem"
-                  onClick={() => categoryClickHandler(brand.memberNick)} // ✅
+                  onClick={() => categoryClickHandler(brand.memberNick)}
                   sx={{ cursor: "pointer" }}>
                   <Stack spacing={0.5} alignItems="center">
                     <Typography className="megaTitle">
-                      {brand.memberNick} // ✅
+                      {brand.memberNick}
                     </Typography>
                   </Stack>
                 </Box>

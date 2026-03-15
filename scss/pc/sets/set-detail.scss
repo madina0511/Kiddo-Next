@@ -1,0 +1,191 @@
+// set-detail.scss
+.set-detail-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fff;
+  padding: 40px 0 80px;
+
+  .set-detail-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: row;
+    gap: 48px;
+    align-items: flex-start;
+
+    // LEFT
+    .set-detail-left {
+      width: 45%;
+      flex-shrink: 0;
+      position: sticky;
+      top: 100px;
+
+      img {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    // RIGHT
+    .set-detail-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+
+      .set-detail-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e0ddd8;
+
+        .set-brand {
+          font-size: 12px !important;
+          color: #888 !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .set-name {
+          font-size: 26px !important;
+          font-weight: 500 !important;
+          color: #1a1a1a !important;
+          letter-spacing: -0.3px;
+        }
+
+        .set-total-price {
+          font-size: 18px !important;
+          color: #1a1a1a !important;
+          font-weight: 500 !important;
+          margin-top: 4px;
+        }
+      }
+
+      // Products gorizontal scroll
+      .set-products {
+        display: flex;
+        flex-direction: row;
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+
+        &::-webkit-scrollbar {
+          height: 3px;
+        }
+        &::-webkit-scrollbar-track {
+          background: #f0ede8;
+        }
+        &::-webkit-scrollbar-thumb {
+          background: #c8c4be;
+          border-radius: 2px;
+        }
+
+        .set-product-card {
+          min-width: 200px;
+          max-width: 200px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          flex-shrink: 0;
+
+          .product-image-wrap {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            overflow: hidden;
+            background: #eceae5;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              display: block;
+              transition: transform 0.4s ease;
+            }
+
+            &:hover img {
+              transform: scale(1.04);
+            }
+          }
+
+          .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .product-name {
+              font-size: 13px !important;
+              color: #1a1a1a !important;
+              font-weight: 500 !important;
+              line-height: 1.3;
+            }
+
+            .product-price {
+              font-size: 14px !important;
+              color: #1a1a1a !important;
+              font-weight: 500 !important;
+            }
+
+            // Size buttons
+            .size-wrap {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 4px;
+              margin-top: 4px;
+
+              .size-btn {
+                padding: 4px 8px;
+                font-size: 11px;
+                color: #555;
+                border: 0.5px solid #d0cdc8;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                background: #fff;
+
+                &:hover {
+                  border-color: #1a1a1a;
+                  color: #1a1a1a;
+                }
+
+                &.active {
+                  background: #1a1a1a;
+                  color: #fff;
+                  border-color: #1a1a1a;
+                }
+              }
+            }
+
+            // Add to cart
+            .add-to-cart-btn {
+              margin-top: 4px;
+              width: 100%;
+              padding: 10px 0 !important;
+              font-size: 12px !important;
+              font-weight: 500 !important;
+              letter-spacing: 0.5px;
+              color: #fff !important;
+              background-color: #181a20 !important;
+              border-radius: 0 !important;
+              text-transform: uppercase !important;
+              transition: background 0.2s ease !important;
+
+              &:hover {
+                background-color: #333 !important;
+              }
+
+              &:disabled {
+                background-color: #d5d5d5 !important;
+                color: #fff !important;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

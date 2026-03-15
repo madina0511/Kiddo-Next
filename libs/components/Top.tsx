@@ -72,7 +72,7 @@ const Top = () => {
 
         {/* Desktop Menu */}
         <div className="desktopMenu">
-          <MegaMenuPopper label="SHOP" />
+          <MegaMenuPopper label="Shop" />
           <Link href="/sets">Sets</Link>
           <BrandMenuPopper label="Brands" />
           <Link href="/stories">Stories</Link>

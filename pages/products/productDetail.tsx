@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
+import withLayoutBase from "@/libs/components/layout/LayoutBase";
 
 const ProductDetail = ({ initialComment, ...props }: any) => {
   const router = useRouter();
@@ -369,4 +370,4 @@ ProductDetail.defaultProps = {
   },
 };
 
-export default LayoutHome(ProductDetail);
+export default withLayoutBase(ProductDetail);

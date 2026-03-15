@@ -1,11 +1,10 @@
-import Link from "next/link";
-import { Box, Stack, Typography } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
+import { Box, IconButton, Typography } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import styles from "@/scss/pc/products/productCard.module.scss";
 import { useRouter } from "next/router";
-import { products } from "@/libs/common";
+import { useState } from "react";
 
 export interface ProductCardItem {
   _id: string;
@@ -15,7 +14,7 @@ export interface ProductCardItem {
   productImages: string[];
   // productViews: number;
   // productLikes: number;
-  // meLiked: [{ myFavorite: false }];
+  meLiked?: { myFavorite: boolean }[];
 }
 
 interface ProductCardProps {
@@ -23,32 +22,32 @@ interface ProductCardProps {
   likeProductHandler: (id: string) => void;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
   const router = useRouter();
+  const [isLiked, setIsLiked] = useState(
+    product?.meLiked?.[0]?.myFavorite ?? false,
+  );
 
-  //HANDLERS
   const pushDetailHandler = async (productId: string) => {
     await router.push({
       pathname: "/products/productDetail",
       query: { id: productId },
     });
   };
+  const handleLike = () => {
+    setIsLiked((prev) => !prev); // local state o'zgaradi
+    likeProductHandler(product._id); // parent ga xabar beradi
+  };
 
   const mainImage = product.productImages?.[0] || "/products/sweater_polo.avif";
   const hoverImage = product.productImages?.[1] || mainImage;
-
-  function likeProductHandler(_id: string): void {
-    // throw new Error("Function not implemented.");
-  }
 
   return (
     <Box style={{ textDecoration: "none", color: "inherit" }}>
       <div className={styles.card}>
         <div
           className={styles.imageWrap}
-          onClick={() => {
-            pushDetailHandler(product._id);
-          }}>
+          onClick={() => pushDetailHandler(product._id)}>
           <img
             src={mainImage}
             alt={product.productTitle}
@@ -69,21 +68,23 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <span className={styles.title}>{product.productTitle}</span>
             <span className={styles.price}>${product.productPrice}</span>
           </div>
+
           <div className={styles.view_like}>
-            <IconButton color={"default"}>
+            <IconButton color="default">
               <RemoveRedEyeIcon />
             </IconButton>
             <Typography className="view-cnt">
               {/* {product?.productViews} */}
             </Typography>
+
             <IconButton
-              color={"default"}
+              color="default"
               onClick={() => likeProductHandler(product._id)}>
-              {/* {product?.meLiked && products?.meLiked[0]?.myFavorite ? ( */}
-              <FavoriteIcon style={{ color: "red" }} />
-              {/* ) : ( */}
-              <FavoriteIcon />
-              {/* )} */}
+              {isLiked ? (
+                <FavoriteIcon style={{ color: "red" }} />
+              ) : (
+                <FavoriteBorderIcon />
+              )}
             </IconButton>
             <Typography className="view-cnt">
               {/* {product?.productLikes} */}
