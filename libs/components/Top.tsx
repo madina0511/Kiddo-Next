@@ -1,5 +1,5 @@
 import { Stack, Box, Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import Badge from "@mui/material/Badge";
 import IconButton from "@mui/material/IconButton";
@@ -10,17 +10,44 @@ import Link from "next/link";
 import { REACT_APP_API_URL } from "../types/config";
 import MegaMenuPopper from "./MegaMenuPopper";
 import BrandMenuPopper from "./brands/MegaMenuPopper";
+import { useRouter } from "next/router";
 
 const Top = () => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({
-    _id: "sa;dlkfjsldkfj",
+    _id: "",
     memberImage: "",
   });
   // ✅ logout menu uchun
   const [logoutAnchor, setLogoutAnchor] = useState<null | HTMLElement>(null);
   const logoutOpen = Boolean(logoutAnchor);
+  const [scrolled, setScrolled] = useState(false);
+  // Apollo
 
+  // Effects
+  useEffect(() => {
+    const handleScroll = () => {
+      const isHomePage = router.pathname === "/";
+      console.log("pathname:", router.pathname);
+      console.log("isHomePage:", isHomePage);
+      if (isHomePage) {
+        console.log("scrollY:", window.scrollY);
+        const heroHeight = window.innerHeight;
+        setScrolled(window.scrollY > heroHeight - 80);
+      } else {
+        setScrolled(true); // ← boshqa sahifalarda har doim oq
+      }
+    };
+
+    // ← sahifa load bo'lganda ham tekshir
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [router.pathname]);
+
+  // Handlers
   const logOut = () => {
     // TODO: sizning logout logikangiz
     console.log("logout");
@@ -30,8 +57,8 @@ const Top = () => {
   const handleClose = () => setOpen(false);
 
   return (
-    <Stack className="container">
-      <nav className="topNav">
+    <nav className={`topNav ${scrolled ? "scrolled" : ""}`}>
+      <Stack className="container">
         {/* logo */}
         <Stack className="topNav-logo">
           <Link href="/">
@@ -116,8 +143,8 @@ const Top = () => {
             )}
           </Box>
         </div>
-      </nav>
-    </Stack>
+      </Stack>
+    </nav>
   );
 };
 

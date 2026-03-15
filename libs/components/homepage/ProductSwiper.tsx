@@ -1,5 +1,3 @@
-"use client";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import Link from "next/link";
@@ -29,8 +27,8 @@ const ProductSwiper = () => {
     <Stack className="product-wrap">
       <Swiper
         modules={[Navigation, Autoplay]}
-        spaceBetween={20}
-        slidesPerView={6}
+        spaceBetween={16}
+        slidesPerView={4}
         navigation
         loop
         speed={4000}
@@ -47,6 +45,7 @@ const ProductSwiper = () => {
                 className="card"
                 onMouseEnter={() => swiperRef.current?.autoplay.stop()}
                 onMouseLeave={() => swiperRef.current?.autoplay.start()}>
+                <img src="/img/banner/unity.jpg" alt={product.name} />
                 <div className="text">
                   <h3>{product.name}</h3>
                   <p>{product.price}</p>

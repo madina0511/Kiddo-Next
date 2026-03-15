@@ -1,15 +1,56 @@
-#pc-wrap {
-  /* Top.scss */
+.topNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  background: transparent;
+  transition:
+    background 0.4s ease,
+    backdrop-filter 0.4s ease,
+    box-shadow 0.4s ease;
+  /* ← video ustida linklar oq */
+  a,
+  .megaLabel {
+    color: #fff;
+  }
+  .loginBtn {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    &:hover {
+      background: #fff;
+      color: #282b2d;
+    }
+  }
 
-  .topNav {
-    z-index: 2000; // navbar o'zi ham yuqorida bo'lsin
-    display: flex;
+  /* ← scroll bo'lganda oq navbar */
+  &.scrolled {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+    opacity: 0.9;
+
+    a,
+    .megaLabel {
+      color: #212121;
+    }
+
+    .loginBtn {
+      background: #282b2d;
+      border-color: #282b2d;
+      color: #fff;
+      &:hover {
+        background: #fff;
+        color: #282b2d;
+      }
+    }
+  }
+  .container {
+    flex-direction: row;
     justify-content: space-between;
-    padding: 16px 0px; /* py-4 px-6 */
-    // border-bottom: 1px solid #d1d5db; /* border-gray-300 */
-    background: #fff;
-    position: relative;
-    transition: all 0.2s ease;
+    align-items: center;
     .topNav-logo {
       width: 70px;
       height: 70px;
@@ -43,6 +84,7 @@
         height: 100%;
         .megaLabel {
           cursor: pointer;
+
           // font-family: "Roboto", "Helvetica", "Arial", sans-serif;
           // font-size: 16px;
           // font-weight: 400;

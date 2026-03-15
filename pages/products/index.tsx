@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import styles from "@/scss/pc/products/products.module.scss";
 import ProductCard from "@/libs/components/products/productCard";
 import { ProductCategory } from "@/libs/enums/product.enum";
+import withLayoutBase from "@/libs/components/layout/LayoutBase";
 
 const Products = ({ initialInput }: any) => {
   const router = useRouter();
@@ -136,4 +137,4 @@ Products.defaultProps = {
   },
 };
 
-export default LayoutHome(Products);
+export default withLayoutBase(Products);

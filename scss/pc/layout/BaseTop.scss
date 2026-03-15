@@ -1,0 +1,225 @@
+#pc-wrap {
+  #top {
+    .BaseTopNav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+      background: #fff;
+      transition:
+        background 0.4s ease,
+        backdrop-filter 0.4s ease,
+        box-shadow 0.4s ease;
+
+      .container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .topNav-logo {
+          width: 70px;
+          height: 70px;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          left: 0px;
+
+          .logo {
+            cursor: pointer;
+            width: 150px;
+            height: 150px;
+          }
+        }
+
+        /* Desktop menu */
+        .desktopMenu {
+          display: none;
+          align-items: center;
+          gap: 40px;
+          @media (min-width: 640px) {
+            & {
+              display: flex;
+            }
+          }
+          .megaAnchor {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            height: 100%;
+            .megaLabel {
+              cursor: pointer;
+
+              // font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+              // font-size: 16px;
+              // font-weight: 400;
+              // letter-spacing: inherit;
+              // color: #212121;
+              user-select: none;
+              &.isOpen {
+                opacity: 0.7;
+              }
+            }
+            .megaPaper {
+              background: #fff;
+              border: 1px solid #e5e7eb;
+              border-radius: 14px;
+              margin-top: 1px;
+              margin-left: 0px;
+              padding: 18px 22px;
+              width: 900px; /* mega-menu kengligi */
+              .megaGrid {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 30px;
+                .megaItem {
+                  text-decoration: none;
+                  color: inherit;
+                  padding: 10px 8px;
+                  border-radius: 12px;
+                  transition: background 0.15s ease;
+                  &:hover {
+                    background: #f3f4f6;
+                  }
+                  .megaTitle {
+                    font-size: 16px;
+                    font-weight: 700;
+                    line-height: 1.2;
+                    color: #555a64;
+                  }
+
+                  .megaSubtitle {
+                    font-size: 12px;
+                    color: #6b7280;
+                  }
+                }
+              }
+            }
+          }
+        }
+        .searchBox {
+          display: none; /* hidden */
+          align-items: center;
+          gap: 8px; /* gap-2 */
+          font-size: 14px; /* text-sm */
+          border: 1px solid #d1d5db; /* border-gray-300 */
+          padding: 0 12px; /* px-3 */
+          border-radius: 9999px; /* rounded-full */
+          @media (min-width: 1024px) {
+            & {
+              display: flex; /* lg:flex */
+            }
+          }
+          .searchInput {
+            padding: 6px 0; /* py-1.5 */
+            width: 100%;
+            background: transparent;
+            outline: none;
+            border: none;
+            &::placeholder {
+              color: #6b7280; /* placeholder-gray-500 */
+            }
+          }
+        }
+        .cartWrap {
+          position: relative;
+          cursor: pointer;
+          .cartBadge {
+            position: absolute;
+            top: -8px; /* -top-2 */
+            right: -12px; /* -right-3 */
+            width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            font-size: 12px; /* text-xs */
+            color: #fff;
+            background: #6366f1; /* bg-indigo-500 */
+            border: none;
+          }
+        }
+
+        .loginBtn {
+          cursor: pointer;
+          padding: 8px 32px; /* py-2 px-8 */
+          background: #282b2d; /* indigo-500 */
+          color: #fff;
+          border-radius: 9999px;
+          border: none;
+          transition: background 0.2s ease;
+          &:hover {
+            color: #282b2d;
+            background: #fff; /* indigo-600 */
+            border: 1px solid #282b2d;
+          }
+        }
+        .login-user {
+          width: 60px;
+          height: 60px;
+          background: #6b7280;
+          border: none;
+          border-radius: 50%;
+        }
+      }
+
+      /* Mobile menu button */
+      .mobileMenuBtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+      }
+      @media (min-width: 640px) {
+        .mobileMenuBtn {
+          display: none; /* sm:hidden */
+        }
+      }
+
+      /* Mobile dropdown */
+      .mobileMenu {
+        position: absolute;
+        top: 60px; /* top-[60px] */
+        left: 0;
+        width: 100%;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); /* shadow-md */
+        padding: 16px 20px; /* py-4 px-5 */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px; /* gap-2 */
+        font-size: 14px; /* text-sm */
+      }
+      @media (min-width: 768px) {
+        .mobileMenu {
+          display: none; /* md:hidden */
+        }
+      }
+
+      .mobileMenuHidden {
+        display: none;
+      }
+
+      .mobileLink {
+        display: block;
+      }
+
+      .mobileLoginBtn {
+        cursor: pointer;
+        padding: 8px 24px; /* py-2 px-6 */
+        margin-top: 8px; /* mt-2 */
+        background: #6366f1;
+        color: #fff;
+        border-radius: 9999px;
+        border: none;
+        transition: background 0.2s ease;
+        font-size: 14px;
+      }
+      .mobileLoginBtn:hover {
+        background: #4f46e5;
+      }
+    }
+  }
+}
