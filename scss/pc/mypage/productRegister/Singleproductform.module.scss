@@ -1,0 +1,325 @@
+// ── Tokens ──────────────────────────────────────────
+$border: 0.5px solid #e5e5e3;
+$border-dash: 0.5px dashed #d0d0ce;
+$radius-sm: 8px;
+$radius-md: 10px;
+$radius-lg: 12px;
+$color-text: #1a1a1a;
+$color-muted: #888;
+$color-hint: #bbb;
+$color-bg: #fafafa;
+$color-success-bg: #eafaf3;
+$color-success-text: #1a8a5a;
+$transition: 0.15s ease;
+
+// ── Form ──────────────────────────────────────────────
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// ── Card ──────────────────────────────────────────────
+.card {
+  background: #fff;
+  border: $border;
+  border-radius: $radius-lg;
+  padding: 1.25rem;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: $color-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 1rem;
+}
+
+// ── Grids ─────────────────────────────────────────────
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 360px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Field ─────────────────────────────────────────────
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 9px 11px;
+    border-radius: $radius-sm;
+    border: 0.5px solid #d5d5d3;
+    background: $color-bg;
+    color: $color-text;
+    outline: none;
+    transition:
+      border-color $transition,
+      box-shadow $transition;
+
+    &:focus {
+      border-color: #999;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+
+    &::placeholder {
+      color: $color-hint;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+}
+
+// ── Images ────────────────────────────────────────────
+.imagesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: $border;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.removeImg {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  transition: background $transition;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.78);
+  }
+}
+
+.mainBadge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.uploadBox {
+  aspect-ratio: 1;
+  border: $border-dash;
+  border-radius: $radius-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 12px;
+  transition:
+    border-color $transition,
+    background $transition;
+
+  &:hover {
+    border-color: #999;
+    background: $color-bg;
+    color: #666;
+  }
+}
+
+.hint {
+  font-size: 11px;
+  color: $color-hint;
+}
+
+// ── Sizes ─────────────────────────────────────────────
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sizeBtn {
+  padding: 6px 14px;
+  border-radius: $radius-sm;
+  border: 0.5px solid #d5d5d3;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  background: #fff;
+  color: #666;
+  transition: all 0.12s;
+
+  &:hover {
+    border-color: #999;
+    color: #333;
+  }
+
+  &.active {
+    background: $color-text;
+    color: #fff;
+    border-color: $color-text;
+    font-weight: 500;
+  }
+}
+
+// ── Actions ───────────────────────────────────────────
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cancelBtn {
+  padding: 11px 20px;
+  border-radius: $radius-md;
+  border: 0.5px solid #d5d5d3;
+  background: transparent;
+  color: $color-muted;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all $transition;
+
+  &:hover {
+    background: #f5f5f3;
+    color: #333;
+  }
+}
+
+.submitBtn {
+  flex: 1;
+  padding: 11px;
+  border-radius: $radius-md;
+  border: none;
+  background: $color-text;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background $transition,
+    opacity $transition;
+
+  &:hover {
+    background: #333;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── Success ───────────────────────────────────────────
+.success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  h3 {
+    font-size: 17px;
+    font-weight: 500;
+    color: $color-text;
+  }
+
+  button {
+    padding: 9px 20px;
+    border-radius: $radius-sm;
+    border: 0.5px solid #d5d5d3;
+    background: transparent;
+    color: #555;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+
+    &:hover {
+      background: #f5f5f3;
+    }
+  }
+}
+
+.successIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $color-success-bg;
+  color: $color-success-text;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,92 @@
+// ── Tokens ──────────────────────────────────────────
+$border: 0.5px solid #e5e5e3;
+$radius-md: 10px;
+$radius-lg: 12px;
+$color-text: #1a1a1a;
+$color-muted: #888;
+$transition: 0.15s ease;
+
+// ── Page ──────────────────────────────────────────────
+.page {
+  min-height: 100vh;
+  background: #f7f7f5;
+  padding: 2rem 1rem 4rem;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+// ── Header ────────────────────────────────────────────
+.header {
+  margin-bottom: 1.75rem;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: $color-text;
+    margin: 0 0 4px;
+  }
+
+  p {
+    font-size: 14px;
+    color: $color-muted;
+    margin: 0;
+  }
+}
+
+// ── Tabs ──────────────────────────────────────────────
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: $radius-md;
+  border: $border;
+  background: #fff;
+  color: $color-muted;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all $transition;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    border-color: #ccc;
+    color: #444;
+  }
+
+  &.active {
+    background: $color-text;
+    color: #fff;
+    border-color: $color-text;
+    font-weight: 500;
+  }
+}
+
+// ── Form wrap ─────────────────────────────────────────
+.formWrap {
+  // slight fade-in when tab switches
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
