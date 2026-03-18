@@ -1,0 +1,246 @@
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Stack, Tab, Typography, Button, Pagination } from "@mui/material";
+import CommunityCard from "../../libs/components/common/CommunityCard";
+import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
+import { BoardArticle } from "../../libs/types/board-article/board-article";
+import { BoardArticlesInquiry } from "../../libs/types/board-article/board-article.input";
+import { BoardArticleCategory } from "../../libs/enums/board-article.enum";
+import { Messages } from "../../libs/config";
+import withLayoutBase from "@/libs/components/layout/LayoutBase";
+import { T } from "@/libs/common";
+import { sweetMixinErrorAlert } from "@/libs/types/sweetAlert";
+import { Direction } from "@/libs/enums/common.enum";
+
+const defaultCommunityInput: BoardArticlesInquiry = {
+  page: 1,
+  limit: 6,
+  sort: "createdAt",
+  direction: Direction.ASC,
+  search: {
+    articleCategory: BoardArticleCategory.FREE,
+  },
+};
+
+const Community = ({ initialInput = defaultCommunityInput }: T) => {
+  const device = useDeviceDetect();
+  const router = useRouter();
+  const { query } = router;
+  const articleCategory = query?.articleCategory as
+    | BoardArticleCategory
+    | undefined;
+
+  const [searchCommunity, setSearchCommunity] = useState<BoardArticlesInquiry>({
+    ...defaultCommunityInput,
+    ...initialInput,
+    search: {
+      ...defaultCommunityInput.search,
+      ...initialInput?.search,
+      articleCategory:
+        articleCategory ||
+        initialInput?.search?.articleCategory ||
+        BoardArticleCategory.FREE,
+    },
+  });
+
+  const [boardArticles, setBoardArticles] = useState<BoardArticle[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!query?.articleCategory) {
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { articleCategory: "FREE" },
+        },
+        undefined,
+        { shallow: true },
+      );
+      return;
+    }
+
+    setSearchCommunity((prev) => ({
+      ...prev,
+      page: 1,
+      search: {
+        ...prev.search,
+        articleCategory: query.articleCategory as BoardArticleCategory,
+      },
+    }));
+  }, [query?.articleCategory, router]);
+
+  const tabChangeHandler = async (e: T, value: string) => {
+    setSearchCommunity((prev) => ({
+      ...prev,
+      page: 1,
+      search: {
+        ...prev.search,
+        articleCategory: value as BoardArticleCategory,
+      },
+    }));
+
+    await router.push(
+      {
+        pathname: "/kiddo-club",
+        query: { articleCategory: value },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
+  const paginationHandler = (e: T, value: number) => {
+    setSearchCommunity((prev) => ({ ...prev, page: value }));
+  };
+
+  const likeArticleHandler = async (e: any, user: any, id: string) => {
+    try {
+      e.stopPropagation();
+      if (!id) return;
+      if (!user?._id) throw new Error(Messages.error2);
+    } catch (err: any) {
+      console.log("ERROR, likePropertyHandler:", err.message);
+      sweetMixinErrorAlert(err.message).then();
+    }
+  };
+
+  if (device === "mobile") {
+    return <h1>COMMUNITY PAGE MOBILE</h1>;
+  }
+
+  return (
+    <div id="community-list-page">
+      <div className="container">
+        <TabContext
+          value={
+            searchCommunity?.search?.articleCategory ||
+            BoardArticleCategory.FREE
+          }>
+          <Stack className="main-box">
+            <Stack className="left-config">
+              <Stack className={"image-info"}>
+                <img src={"/img/logo/k_logo.svg"} alt="logo" />
+                <Stack className={"community-name"}>
+                  <Typography className={"name"}>Kiddo Club</Typography>
+                </Stack>
+              </Stack>
+
+              <TabList
+                orientation="vertical"
+                aria-label="community tabs"
+                TabIndicatorProps={{ style: { display: "none" } }}
+                onChange={tabChangeHandler}>
+                <Tab
+                  value="FREE"
+                  label="Free Board"
+                  className={`tab-button ${
+                    searchCommunity?.search?.articleCategory === "FREE"
+                      ? "active"
+                      : ""
+                  }`}
+                />
+                <Tab
+                  value="RECOMMEND"
+                  label="Recommendation"
+                  className={`tab-button ${
+                    searchCommunity?.search?.articleCategory === "RECOMMEND"
+                      ? "active"
+                      : ""
+                  }`}
+                />
+                <Tab
+                  value="NEWS"
+                  label="News"
+                  className={`tab-button ${
+                    searchCommunity?.search?.articleCategory === "NEWS"
+                      ? "active"
+                      : ""
+                  }`}
+                />
+                <Tab
+                  value="HUMOR"
+                  label="Humor"
+                  className={`tab-button ${
+                    searchCommunity?.search?.articleCategory === "HUMOR"
+                      ? "active"
+                      : ""
+                  }`}
+                />
+              </TabList>
+            </Stack>
+
+            <Stack className="right-config">
+              <Stack className="panel-config">
+                <Stack className="title-box">
+                  <Stack className="left">
+                    <Typography className="title">
+                      {searchCommunity?.search?.articleCategory || "FREE"} BOARD
+                    </Typography>
+                    <Typography className="sub-title">
+                      Express your opinions freely here without content
+                      restrictions
+                    </Typography>
+                  </Stack>
+
+                  <Button
+                    onClick={() =>
+                      router.push({
+                        pathname: "/mypage",
+                        query: { category: "writeArticle" },
+                      })
+                    }
+                    className="right">
+                    Write
+                  </Button>
+                </Stack>
+
+                {["FREE", "RECOMMEND", "NEWS", "HUMOR"].map((tab) => (
+                  <TabPanel value={tab} key={tab}>
+                    <Stack className="list-box">
+                      {totalCount ? (
+                        boardArticles.map((boardArticle: BoardArticle) => (
+                          <CommunityCard
+                            boardArticle={boardArticle}
+                            key={boardArticle?._id}
+                            likeBoardArticleHandler={likeArticleHandler}
+                          />
+                        ))
+                      ) : (
+                        <Stack className={"no-data"}>
+                          <img src="/img/icons/icoAlert.svg" alt="" />
+                          <p>No Article found!</p>
+                        </Stack>
+                      )}
+                    </Stack>
+                  </TabPanel>
+                ))}
+              </Stack>
+            </Stack>
+          </Stack>
+        </TabContext>
+
+        {totalCount > 0 && (
+          <Stack className="pagination-config">
+            <Stack className="pagination-box">
+              <Pagination
+                count={Math.ceil(totalCount / searchCommunity.limit)}
+                page={searchCommunity.page}
+                shape="circular"
+                color="primary"
+                onChange={paginationHandler}
+              />
+            </Stack>
+            <Stack className="total-result">
+              <Typography>
+                Total {totalCount} article{totalCount > 1 ? "s" : ""} available
+              </Typography>
+            </Stack>
+          </Stack>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default withLayoutBase(Community);

@@ -4,6 +4,7 @@ import CheckroomOutlinedIcon from "@mui/icons-material/CheckroomOutlined";
 import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const values = [
   {
@@ -25,6 +26,7 @@ const values = [
 ];
 
 const BrandValues = () => {
+  const router = useRouter();
   return (
     <Stack className="values-section">
       <Stack className="values-left">
@@ -56,12 +58,17 @@ const BrandValues = () => {
         </Stack>
 
         <Stack className="values-buttons">
-          <Link href={"/shop"}>
-            <Button className="values-btn primary">SHOP COLLECTION</Button>
-          </Link>
-          <Link href={"/givingback"}>
-            <Button className="values-btn secondary">HOW WE GIVE BACK</Button>
-          </Link>
+          <Button
+            onClick={() => router.push("/products")}
+            className="values-btn primary">
+            SHOP COLLECTION
+          </Button>
+
+          <Button
+            onClick={() => router.push("/kiddo-cares")}
+            className="values-btn secondary">
+            KIDDO CARES
+          </Button>
         </Stack>
       </Stack>
     </Stack>
