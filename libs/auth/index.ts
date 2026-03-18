@@ -68,6 +68,7 @@ export const signUp = async (
   password: string,
   phone: string,
   type: string,
+  agentCode: string,
 ): Promise<void> => {
   try {
     const { jwtToken } = await requestSignUpJwtToken({
@@ -75,6 +76,7 @@ export const signUp = async (
       password,
       phone,
       type,
+      agentCode,
     });
 
     if (jwtToken) {
@@ -93,11 +95,13 @@ const requestSignUpJwtToken = async ({
   password,
   phone,
   type,
+  agentCode,
 }: {
   nick: string;
   password: string;
   phone: string;
   type: string;
+  agentCode: string;
 }): Promise<{ jwtToken: string }> => {
   const apolloClient = await initializeApollo();
 
@@ -110,6 +114,7 @@ const requestSignUpJwtToken = async ({
           memberPassword: password,
           memberPhone: phone,
           memberType: type,
+          agentCode: agentCode,
         },
       },
       fetchPolicy: "network-only",

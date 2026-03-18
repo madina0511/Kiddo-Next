@@ -138,7 +138,11 @@ const Top = () => {
               </>
             ) : (
               <Link href="/account/join">
-                <button className="loginBtn">Login</button>
+                <button
+                  onClick={() => router.push("/account/join")}
+                  className="loginBtn">
+                  Login
+                </button>
               </Link>
             )}
           </Box>
