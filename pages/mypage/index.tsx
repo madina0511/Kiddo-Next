@@ -18,6 +18,7 @@ import { sweetErrorHandling } from "@/libs/types/sweetAlert";
 import MyProducts from "@/libs/components/mypage/myProducts";
 import MyFavorites from "@/libs/components/mypage/MyFavorites";
 import RecentlyVisited from "@/libs/components/mypage/ResentlyVisited";
+import MyOrders from "@/libs/components/mypage/MyOrders";
 
 const MyPage = () => {
   const device = useDeviceDetect();
@@ -59,6 +60,7 @@ const MyPage = () => {
                   {category === "myFavorites" && <MyFavorites />}
                   {category === "recentlyVisited" && <RecentlyVisited />}
                   {category === "myArticles" && <MyArticles />}
+                  {category === "myOrders" && <MyOrders />}
                   {category === "writeArticle" && <WriteArticle />}
                   {category === "myProfile" && <MyProfile />}
                 </Stack>

@@ -207,6 +207,37 @@ const MyMenu = () => {
                   </div>
                 </Link>
               </ListItem>
+              <ListItem className={pathname === "myOrders" ? "focus" : ""}>
+                <Link
+                  href={{
+                    pathname: "/mypage",
+                    query: { category: "myOrders" },
+                  }}
+                  scroll={false}>
+                  <div className={"flex-box"}>
+                    {category === "myOrders" ? (
+                      <img
+                        className={"com-icon"}
+                        src={"/img/icons/searchWhite.svg"}
+                        alt={"com-icon"}
+                      />
+                    ) : (
+                      <img
+                        className={"com-icon"}
+                        src={"/img/icons/search.svg"}
+                        alt={"com-icon"}
+                      />
+                    )}
+
+                    <Typography
+                      className={"sub-title"}
+                      variant={"subtitle1"}
+                      component={"p"}>
+                      My Orders
+                    </Typography>
+                  </div>
+                </Link>
+              </ListItem>
             </List>
           </Stack>
           <Stack className={"section"} sx={{ marginTop: "10px" }}>
