@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useRef } from "react";
 import styles from "../../../scss/pc/mypage/productRegister/Singleproductform.module.scss";
 

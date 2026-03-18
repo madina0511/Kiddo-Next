@@ -11,7 +11,7 @@ export interface ProductCardItem {
   productTitle: string;
   brandName: string;
   productPrice: number;
-  productImages: string[];
+  productImages?: string[];
   // productViews: number;
   // productLikes: number;
   meLiked?: { myFavorite: boolean }[];
@@ -20,6 +20,8 @@ export interface ProductCardItem {
 interface ProductCardProps {
   product: ProductCardItem;
   likeProductHandler: (id: string) => void;
+  myFavorites?: boolean;
+  recentlyVisited?: boolean;
 }
 
 const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {

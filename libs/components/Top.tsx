@@ -75,7 +75,7 @@ const Top = () => {
           <MegaMenuPopper label="Shop" />
           <Link href="/sets">Sets</Link>
           <BrandMenuPopper label="Brands" />
-          <Link href="/stories">Stories</Link>
+          <Link href="/journal">Journal</Link>
           <Link href="/sizeGuide">SizeGuide</Link>
           {user._id ? <Link href={"/mypage"}>My Page</Link> : null}
 

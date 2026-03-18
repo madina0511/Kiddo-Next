@@ -1,3 +1,6 @@
+export interface T {
+  [key: string]: any;
+}
 export const sizeGuideRows = [
   { age: "0 months", height: 56, chest: 40, waist: 38, hip: 41, inseam: 19 },
   { age: "3 months", height: 62, chest: 44, waist: 40, hip: 45, inseam: 22 },

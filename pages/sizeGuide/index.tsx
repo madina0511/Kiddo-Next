@@ -1,6 +1,7 @@
 import { sizeGuideRows } from "@/libs/common";
+import withLayoutBase from "@/libs/components/layout/LayoutBase";
 import { Box, Container, Stack, Typography } from "@mui/material";
-export default function SizeGuidePage() {
+function SizeGuidePage() {
   return (
     <Box sx={{ backgroundColor: "#f5f5f5", py: 8 }}>
       <Container maxWidth="md">
@@ -80,3 +81,5 @@ export default function SizeGuidePage() {
     </Box>
   );
 }
+
+export default withLayoutBase(SizeGuidePage);

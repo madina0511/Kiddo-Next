@@ -1,0 +1,152 @@
+// ── Layout ────────────────────────────────────────────
+.wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+}
+
+// ── Left — sticky image ───────────────────────────────
+.imageCol {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: #ede8e2;
+
+  @media (max-width: 768px) {
+    position: relative;
+    height: 70vw;
+    min-height: 320px;
+  }
+}
+
+.imageInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  object-fit: cover;
+}
+
+// ── Right — scrollable content ────────────────────────
+.contentCol {
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    min-height: auto;
+    align-items: flex-start;
+  }
+}
+
+.contentInner {
+  padding: 5rem 4.5rem;
+  max-width: 560px;
+
+  @media (max-width: 1100px) {
+    padding: 4rem 3rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 2.5rem 1.5rem;
+    max-width: 100%;
+  }
+}
+
+// ── Back link ─────────────────────────────────────────
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 3rem;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #1a1a1a;
+
+    .backLine {
+      width: 40px;
+    }
+  }
+}
+
+.backLine {
+  display: block;
+  width: 24px;
+  height: 0.5px;
+  background: currentColor;
+  transition: width 0.25s ease;
+}
+
+// ── Brand ─────────────────────────────────────────────
+.brand {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase;
+  color: #888 !important;
+  margin-bottom: 1.25rem !important;
+}
+
+// ── Title ─────────────────────────────────────────────
+.title {
+  font-size: clamp(28px, 3.5vw, 48px) !important;
+  font-weight: 400 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.025em !important;
+  color: #1a1a1a !important;
+  margin-bottom: 2rem !important;
+}
+
+// ── Divider ───────────────────────────────────────────
+.divider {
+  width: 32px;
+  height: 0.5px;
+  background: #d5d5d3;
+  margin-bottom: 2rem;
+}
+
+// ── Body ──────────────────────────────────────────────
+.body {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #555;
+  max-width: 480px;
+
+  p {
+    margin-bottom: 1.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    max-width: 100%;
+  }
+}

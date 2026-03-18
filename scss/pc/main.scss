@@ -4,6 +4,14 @@
 @use "../pc/layout/Top.scss";
 @use "../pc/layout/BaseTop.scss";
 @use "../pc/homepage/homepage.scss";
+
+@use "../pc/mypage/mypage.scss";
+@use "../pc/mypage/myArticles.scss";
+@use "../pc/mypage/myFavorites.scss";
+@use "../pc/mypage/myProfile.scss";
+@use "../pc/mypage/myProducts.scss";
+@use "../pc/mypage/mySaved.scss";
+
 @use "../pc/brand/detail.scss";
 @use "../pc/sets/sets.scss";
 @use "../pc/sets/set-detail.scss";
