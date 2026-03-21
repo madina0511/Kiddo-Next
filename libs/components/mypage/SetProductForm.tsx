@@ -7,6 +7,8 @@ import {
   AgeGroup,
   Gender,
   ProductColor,
+  AGE_GROUP_LABELS,
+  CLOTHING_SIZE_LABELS,
 } from "@/libs/enums/product.enum";
 import { ProductInput } from "@/libs/types/product/product.input";
 import axios from "axios";
@@ -22,6 +24,8 @@ import {
   sweetMixinErrorAlert,
   sweetMixinSuccessAlert,
 } from "@/libs/types/sweetAlert";
+import { useMutation } from "@apollo/client";
+import { CREATE_PRODUCT } from "@/apollo/user/mutation";
 
 const PRODUCT_TYPES = Object.values(ProductType);
 const PRODUCT_CATEGORIES = Object.values(ProductCategory);
@@ -38,6 +42,9 @@ export default function SetProductForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const coverRef = useRef<HTMLInputElement>(null);
+
+  // APOLLO
+  const [createProduct] = useMutation(CREATE_PRODUCT);
 
   const totalPrice = form.items.reduce(
     (sum, i) => sum + (i.productPrice || 0),
@@ -100,9 +107,9 @@ export default function SetProductForm() {
         item.id === id
           ? {
               ...item,
-              sizes: item.sizes.includes(size)
-                ? item.sizes.filter((s) => s !== size)
-                : [...item.sizes, size],
+              size: item.size.includes(size)
+                ? item.size.filter((s) => s !== size)
+                : [...item.size, size],
             }
           : item,
       ),
@@ -158,11 +165,163 @@ export default function SetProductForm() {
       items: prev.items.filter((i) => i.id !== id),
     }));
   }
- 
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Validation
+    if (!form.productTitle) {
+      await sweetMixinErrorAlert("Set title is required");
+      return;
+    }
+    if (!form.coverImageFile) {
+      await sweetMixinErrorAlert("Cover image is required");
+      return;
+    }
+    for (const item of form.items) {
+      if (!item.productTitle) {
+        await sweetMixinErrorAlert("All item titles are required");
+        return;
+      }
+      if (!item.productPrice) {
+        await sweetMixinErrorAlert("All item prices are required");
+        return;
+      }
+      if (!item.imageFile) {
+        await sweetMixinErrorAlert("All item images are required");
+        return;
+      }
+    }
+
     setLoading(true);
- 
+
+    try {
+      // 1. Har bir item uchun image upload va createProduct
+      const itemIds: string[] = [];
+
+      for (const item of form.items) {
+        // Image upload
+        let imageUrl = "";
+        if (item.imageFile) {
+          const formData = new FormData();
+          formData.append(
+            "operations",
+            JSON.stringify({
+              query: `mutation ImageUploader($file: Upload!, $target: String!) {
+              imageUploader(file: $file, target: $target)
+            }`,
+              variables: { file: null, target: "product" },
+            }),
+          );
+          formData.append("map", JSON.stringify({ "0": ["variables.file"] }));
+          formData.append("0", item.imageFile);
+
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_GRAPHQL_URL}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                "apollo-require-preflight": true,
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          imageUrl = res.data.data.imageUploader;
+        }
+        console.log("item input:", {
+          productType: item.productType,
+          productCategory: item.productCategory,
+          sizes: item.size,
+          ageGroups: item.ageGroups,
+          gender: item.gender,
+          productTitle: item.productTitle,
+          productPrice: item.productPrice,
+          productColors: item.productColors,
+          productDesc: item.productDesc,
+          brandName: form.brandName,
+          productImages: imageUrl ? [imageUrl] : [],
+        });
+        // Item createProduct
+        const itemResult = await createProduct({
+          variables: {
+            input: {
+              productType: item.productType,
+              productCategory: item.productCategory,
+              sizes: item.size,
+              ageGroups: item.ageGroups,
+              gender: item.gender,
+              productTitle: item.productTitle,
+              productPrice: item.productPrice,
+              productColors: item.productColors,
+              productDesc: item.productDesc,
+              brandName: form.brandName,
+              productImages: imageUrl ? [imageUrl] : [],
+            },
+          },
+        });
+
+        itemIds.push(itemResult.data.createProduct._id);
+      }
+
+      // 2. Cover image upload
+      let coverImageUrl = "";
+      if (form.coverImageFile) {
+        const formData = new FormData();
+        formData.append(
+          "operations",
+          JSON.stringify({
+            query: `mutation ImageUploader($file: Upload!, $target: String!) {
+            imageUploader(file: $file, target: $target)
+          }`,
+            variables: { file: null, target: "product" },
+          }),
+        );
+        formData.append("map", JSON.stringify({ "0": ["variables.file"] }));
+        formData.append("0", form.coverImageFile);
+
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_GRAPHQL_URL}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              "apollo-require-preflight": true,
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        coverImageUrl = res.data.data.imageUploader;
+      }
+
+      // 3. Set product yaratish
+      await createProduct({
+        variables: {
+          input: {
+            productType: ProductType.SET,
+            productCategory: form.productCategory,
+            sizes: [],
+            ageGroups: form.ageGroups,
+            gender: form.gender,
+            productTitle: form.productTitle,
+            productPrice: totalPrice,
+            productColors: form.productColors,
+            productDesc: form.productDesc,
+            brandName: form.brandName,
+            productDiscount: form.productDiscount,
+            productImages: coverImageUrl ? [coverImageUrl] : [],
+            setItems: itemIds,
+          },
+        },
+      });
+
+      await sweetMixinSuccessAlert("Set saved successfully!");
+      setSuccess(true);
+      setForm(INITIAL);
+    } catch (err: any) {
+      sweetErrorHandling(err).then();
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (success) {
@@ -270,7 +429,7 @@ export default function SetProductForm() {
                   form.ageGroups.includes(age) ? styles.active : ""
                 }`}
                 onClick={() => toggleAgeGroup(age)}>
-                {age}
+                {AGE_GROUP_LABELS[age]}
               </button>
             ))}
           </div>
@@ -452,10 +611,10 @@ export default function SetProductForm() {
                     key={size}
                     type="button"
                     className={`${styles.sizeBtn} ${
-                      item.sizes.includes(size) ? styles.active : ""
+                      item.size.includes(size) ? styles.active : ""
                     }`}
                     onClick={() => toggleItemSize(item.id, size)}>
-                    {size}
+                    {CLOTHING_SIZE_LABELS[size]}
                   </button>
                 ))}
               </div>
@@ -472,7 +631,7 @@ export default function SetProductForm() {
                       item.ageGroups.includes(age) ? styles.active : ""
                     }`}
                     onClick={() => toggleItemAgeGroup(item.id, age)}>
-                    {age}
+                    {AGE_GROUP_LABELS[age]}
                   </button>
                 ))}
               </div>

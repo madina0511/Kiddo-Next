@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NextPage } from "next";
 import { Pagination, Stack, Typography } from "@mui/material";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
@@ -13,17 +13,36 @@ import { ProductStatus } from "@/libs/enums/product.enum";
 import { T } from "@/libs/common";
 import { sweetConfirmAlert } from "@/libs/types/sweetAlert";
 import ProductCard from "../products/productCard";
+import { GET_AGENT_PRODUCTS } from "@/apollo/user/query";
+import ProductListCard from "./ProductListCard";
 
 const MyProducts = ({ initialInput, ...props }: any) => {
   const device = useDeviceDetect();
-  const [searchFilter, setSearchFilter] =
-    useState<AgentProductsInquiry>(initialInput);
+  const [searchFilter, setSearchFilter] = useState<AgentProductsInquiry>(
+    initialInput ?? {
+      page: 1,
+      limit: 5,
+      sort: "createdAt",
+      search: {
+        productStatus: ProductStatus.ACTIVE,
+      },
+    },
+  );
   const [agentProducts, setAgentProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const user = useReactiveVar(userVar);
   const router = useRouter();
 
   /** APOLLO REQUESTS **/
+
+  const { data, loading, error } = useQuery(GET_AGENT_PRODUCTS, {
+    fetchPolicy: "network-only",
+    variables: { input: searchFilter },
+    onCompleted: (data) => {
+      setAgentProducts(data.getAgentProducts.list);
+      setTotal(data.getAgentProducts.metaCounter[0]?.total ?? 0);
+    },
+  });
 
   /** HANDLERS **/
   const paginationHandler = (e: T, value: number) => {
@@ -95,11 +114,14 @@ const MyProducts = ({ initialInput, ...props }: any) => {
             ) : (
               agentProducts.map((product: Product) => {
                 return (
-                  <ProductCard
+                  <ProductListCard
+                    key={product._id}
                     product={product}
-                    likeProductHandler={function (id: string): void {
-                      throw new Error("Function not implemented.");
-                    }}
+                    deleteHandler={deletePropertyHandler}
+                    updateHandler={updatePropertyHandler}
+                    showActions={
+                      searchFilter.search.productStatus === ProductStatus.ACTIVE
+                    }
                   />
                 );
               })

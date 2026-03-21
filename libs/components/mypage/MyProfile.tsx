@@ -19,7 +19,16 @@ const MyProfile = ({ initialValues, ...props }: any) => {
   const device = useDeviceDetect();
   const token = getJwtToken();
   const user = useReactiveVar(userVar);
-  const [updateData, setUpdateData] = useState<MemberUpdate>(initialValues);
+  const [updateData, setUpdateData] = useState<MemberUpdate>(
+    initialValues || {
+      _id: "",
+
+      memberImage: "",
+      memberNick: "",
+      memberPhone: "",
+      memberAddress: "",
+    },
+  );
 
   /** APOLLO REQUESTS **/
   const [updateMember] = useMutation(UPDATE_MEMBER);
@@ -35,64 +44,61 @@ const MyProfile = ({ initialValues, ...props }: any) => {
   }, [user]);
 
   /** HANDLERS **/
-  const uploadImage = async (e: any) => {
-    try {
-      const image = e.target.files[0];
-      console.log("+image:", image);
+  const uploadImage = useCallback(
+    async (e: any) => {
+      try {
+        const image = e.target.files[0];
+        console.log("+image:", image);
 
-      const formData = new FormData();
-      formData.append(
-        "operations",
-        JSON.stringify({
-          query: `mutation ImageUploader($file: Upload!, $target: String!) {
+        const formData = new FormData();
+        formData.append(
+          "operations",
+          JSON.stringify({
+            query: `mutation ImageUploader($file: Upload!, $target: String!) {
 						imageUploader(file: $file, target: $target) 
 				  }`,
-          variables: {
-            file: null,
-            target: "member",
+            variables: {
+              file: null,
+              target: "member",
+            },
+          }),
+        );
+        formData.append(
+          "map",
+          JSON.stringify({
+            "0": ["variables.file"],
+          }),
+        );
+        formData.append("0", image);
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_GRAPHQL_URL}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              "apollo-require-preflight": true,
+              Authorization: `Bearer ${token}`,
+            },
           },
-        }),
-      );
-      formData.append(
-        "map",
-        JSON.stringify({
-          "0": ["variables.file"],
-        }),
-      );
-      formData.append("0", image);
+        );
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_GRAPHQL_URL}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "apollo-require-preflight": true,
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+        const responseImage = response.data.data.imageUploader;
+        console.log("+responseImage: ", responseImage);
+        setUpdateData((prev) => ({ ...prev, memberImage: responseImage }));
 
-      const responseImage = response.data.data.imageUploader;
-      console.log("+responseImage: ", responseImage);
-      updateData.memberImage = responseImage;
-      setUpdateData({ ...updateData });
-
-      return `${NEXT_PUBLIC_API_URL}/${responseImage}`;
-    } catch (err) {
-      console.log("Error, uploadImage:", err);
-    }
-  };
+        return `${NEXT_PUBLIC_API_URL}/${responseImage}`;
+      } catch (err) {
+        console.log("Error, uploadImage:", err);
+      }
+    },
+    [token],
+  );
   const updateProductHandler = useCallback(async () => {
     try {
       if (!user._id) throw new Error(Messages.error2);
-      updateData._id = user._id;
-
-      const result = await updateMember({
-        variables: {
-          input: updateData,
-        },
-      });
+      const payload = { ...updateData, _id: user._id };
+      const result = await updateMember({ variables: { input: payload } });
 
       // @ts-ignore
       const jwtToken = result.data.updateMember?.accessToken;
@@ -148,7 +154,7 @@ const MyProfile = ({ initialValues, ...props }: any) => {
                   hidden
                   id="hidden-input"
                   onChange={uploadImage}
-                  accept="image/jpg, image/jpeg, image/png"
+                  accept="image/*"
                 />
                 <label htmlFor="hidden-input" className="labeler">
                   <Typography>Upload Profile Image</Typography>
@@ -228,6 +234,7 @@ const MyProfile = ({ initialValues, ...props }: any) => {
 MyProfile.defaultProps = {
   initialValues: {
     _id: "",
+
     memberImage: "",
     memberNick: "",
     memberPhone: "",

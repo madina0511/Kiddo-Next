@@ -12,7 +12,7 @@ export interface SetItem {
   id: string;
   productType: ProductType;
   productCategory: ProductCategory;
-  sizes: ClothingSize[];
+  size: ClothingSize[];
   ageGroups: AgeGroup[];
   gender: Gender;
   productTitle: string;
@@ -42,7 +42,7 @@ export const makeItem = (): SetItem => ({
   id: crypto.randomUUID(),
   productType: ProductType.T_SHIRT,
   productCategory: ProductCategory.INDOORWEAR,
-  sizes: [],
+  size: [],
   ageGroups: [],
   gender: Gender.ALL,
   productTitle: "",

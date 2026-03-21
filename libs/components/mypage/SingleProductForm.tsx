@@ -7,12 +7,22 @@ import {
   AgeGroup,
   Gender,
   ProductColor,
+  CLOTHING_SIZE_LABELS,
+  AGE_GROUP_LABELS,
 } from "@/libs/enums/product.enum";
 import { ProductInput } from "@/libs/types/product/product.input";
+import { useMutation } from "@apollo/client";
+import { CREATE_PRODUCT } from "@/apollo/user/mutation";
+import { getJwtToken } from "@/libs/auth";
+import {
+  sweetErrorHandling,
+  sweetMixinSuccessAlert,
+} from "@/libs/types/sweetAlert";
+import axios from "axios";
 
 const PRODUCT_TYPES = Object.values(ProductType);
 const PRODUCT_CATEGORIES = Object.values(ProductCategory);
-const CLOTHING_SIZES = Object.values(ClothingSize);
+const CLOTHING_SIZE = Object.values(ClothingSize);
 const AGE_GROUPS = Object.values(AgeGroup);
 const GENDERS = Object.values(Gender);
 const PRODUCT_COLORS = Object.values(ProductColor);
@@ -29,7 +39,7 @@ interface SingleFormData
 const INITIAL: SingleFormData = {
   productType: ProductType.T_SHIRT,
   productCategory: ProductCategory.INDOORWEAR,
-  sizes: [],
+  size: [],
   ageGroups: [],
   gender: Gender.ALL,
   productTitle: "",
@@ -47,7 +57,8 @@ export default function SingleProductForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const imgRef = useRef<HTMLInputElement>(null);
-
+  const token = getJwtToken();
+  const [createProduct] = useMutation(CREATE_PRODUCT);
   function setField<K extends keyof SingleFormData>(
     key: K,
     value: SingleFormData[K],
@@ -78,9 +89,9 @@ export default function SingleProductForm() {
   function toggleSize(size: ClothingSize) {
     setForm((prev) => ({
       ...prev,
-      sizes: prev.sizes.includes(size)
-        ? prev.sizes.filter((s) => s !== size)
-        : [...prev.sizes, size],
+      size: prev.size.includes(size)
+        ? prev.size.filter((s) => s !== size)
+        : [...prev.size, size],
     }));
   }
 
@@ -104,31 +115,80 @@ export default function SingleProductForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Validation
+    if (!form.productTitle) {
+      alert("Product title is required");
+      return;
+    }
+    if (!form.productPrice) {
+      alert("Product price is required");
+      return;
+    }
+    if (!form.imageFiles.length) {
+      alert("At least one image is required");
+      return;
+    }
+
     setLoading(true);
+
     try {
-      // TODO: upload images first, then pass URLs to mutation
-      // const uploadedImages = await uploadImages(form.imageFiles);
-      // const input: ProductInput = {
-      //   productType: form.productType,
-      //   productCategory: form.productCategory,
-      //   sizes: form.sizes,
-      //   ageGroups: form.ageGroups,
-      //   gender: form.gender,
-      //   productTitle: form.productTitle,
-      //   brandName: form.brandName,
-      //   productPrice: form.productPrice,
-      //   productColors: form.productColors,
-      //   productDiscount: form.productDiscount,
-      //   productImages: uploadedImages,
-      //   productDesc: form.productDesc,
-      // };
-      // await createProduct({ variables: { input } });
-      await new Promise((r) => setTimeout(r, 800)); // placeholder
+      // Images upload
+      const uploadedImages: string[] = [];
+
+      for (const file of form.imageFiles) {
+        const formData = new FormData();
+        formData.append(
+          "operations",
+          JSON.stringify({
+            query: `mutation ImageUploader($file: Upload!, $target: String!) {
+            imageUploader(file: $file, target: $target)
+          }`,
+            variables: { file: null, target: "product" },
+          }),
+        );
+        formData.append("map", JSON.stringify({ "0": ["variables.file"] }));
+        formData.append("0", file);
+
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_GRAPHQL_URL}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              "apollo-require-preflight": true,
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        uploadedImages.push(res.data.data.imageUploader);
+      }
+
+      // createProduct
+      await createProduct({
+        variables: {
+          input: {
+            productType: form.productType,
+            productCategory: form.productCategory,
+            sizes: form.size,
+            ageGroups: form.ageGroups,
+            gender: form.gender,
+            productTitle: form.productTitle,
+            brandName: form.brandName,
+            productPrice: form.productPrice,
+            productColors: form.productColors,
+            productDiscount: form.productDiscount,
+            productDesc: form.productDesc,
+            productImages: uploadedImages,
+          },
+        },
+      });
+
+      await sweetMixinSuccessAlert("Product saved successfully!");
       setSuccess(true);
       setForm(INITIAL);
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong. Please try again.");
+    } catch (err: any) {
+      sweetErrorHandling(err).then();
     } finally {
       setLoading(false);
     }
@@ -305,17 +365,17 @@ export default function SingleProductForm() {
 
       {/* ── Sizes ── */}
       <div className={styles.card}>
-        <p className={styles.sectionLabel}>Sizes</p>
+        <p className={styles.sectionLabel}>Size</p>
         <div className={styles.sizes}>
-          {CLOTHING_SIZES.map((size) => (
+          {CLOTHING_SIZE.map((size) => (
             <button
               key={size}
               type="button"
               className={`${styles.sizeBtn} ${
-                form.sizes.includes(size) ? styles.active : ""
+                form.size.includes(size) ? styles.active : ""
               }`}
               onClick={() => toggleSize(size)}>
-              {size}
+              {CLOTHING_SIZE_LABELS[size]}
             </button>
           ))}
         </div>
@@ -333,7 +393,7 @@ export default function SingleProductForm() {
                 form.ageGroups.includes(age) ? styles.active : ""
               }`}
               onClick={() => toggleAgeGroup(age)}>
-              {age}
+              {AGE_GROUP_LABELS[age]}
             </button>
           ))}
         </div>

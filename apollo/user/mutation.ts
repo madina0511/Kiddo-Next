@@ -137,3 +137,60 @@ export const LIKE_TARGET_MEMBER = gql`
 /**************************
  *        PRODUCT       *
  *************************/
+export const CREATE_PRODUCT = gql`
+  mutation CreateProduct($input: ProductInput!) {
+    createProduct(input: $input) {
+      _id
+      productType
+      productStatus
+      productCategory
+      size
+      setItems
+      productTitle
+      productPrice
+      gender
+      productDiscount
+      productViews
+      productLikes
+      productComments
+      productRank
+      productImages
+      productDesc
+
+      memberId
+      soldAt
+      deletedAt
+      constructedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct($input: ProductUpdate!) {
+    updateProduct(input: $input) {
+      _id
+      productType
+      productStatus
+      productCategory
+      size
+      setItems
+      productTitle
+      productPrice
+      gender
+      productDiscount
+      productViews
+      productLikes
+      productComments
+      productRank
+      productImages
+      productDesc
+      memberId
+      soldAt
+      deletedAt
+      constructedAt
+      createdAt
+      updatedAt
+    }
+  }
+`;

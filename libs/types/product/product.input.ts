@@ -14,7 +14,7 @@ export interface ProductInput {
 
   productCategory: ProductCategory;
 
-  sizes: ClothingSize[];
+  size: ClothingSize[];
 
   ageGroups: AgeGroup[];
 
