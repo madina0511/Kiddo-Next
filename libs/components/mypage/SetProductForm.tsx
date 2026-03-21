@@ -1,99 +1,46 @@
 import React, { useState, useRef } from "react";
-
 import styles from "../../../scss/pc/mypage/productRegister/Setproductform.module.scss";
+import {
+  ProductType,
+  ProductCategory,
+  ClothingSize,
+  AgeGroup,
+  Gender,
+  ProductColor,
+} from "@/libs/enums/product.enum";
+import { ProductInput } from "@/libs/types/product/product.input";
+import axios from "axios";
+import { getJwtToken } from "@/libs/auth";
+import {
+  INITIAL,
+  makeItem,
+  SetFormData,
+  SetItem,
+} from "@/libs/types/product/set";
+import {
+  sweetErrorHandling,
+  sweetMixinErrorAlert,
+  sweetMixinSuccessAlert,
+} from "@/libs/types/sweetAlert";
 
-type Brand = "MOLO" | "COSMO" | "NORALEE" | "SWEEBIES";
-type Category = "Boys" | "Girls" | "Unisex";
-type Season = "Summer 2025" | "Winter 2025" | "Spring 2025" | "Fall 2025";
-type ItemType =
-  | "Shirt / Jacket"
-  | "Shorts / Pants"
-  | "T-shirt"
-  | "Cap / Hat"
-  | "Shoes"
-  | "Other";
-type Size = "2Y" | "3Y" | "4Y" | "5Y" | "6Y" | "7Y" | "8Y" | "10Y" | "12Y";
+const PRODUCT_TYPES = Object.values(ProductType);
+const PRODUCT_CATEGORIES = Object.values(ProductCategory);
+const CLOTHING_SIZES = Object.values(ClothingSize);
+const AGE_GROUPS = Object.values(AgeGroup);
+const GENDERS = Object.values(Gender);
+const PRODUCT_COLORS = Object.values(ProductColor);
 
-const SIZE_OPTIONS: Size[] = [
-  "2Y",
-  "3Y",
-  "4Y",
-  "5Y",
-  "6Y",
-  "7Y",
-  "8Y",
-  "10Y",
-  "12Y",
-];
-const BRANDS: Brand[] = ["MOLO", "COSMO", "NORALEE", "SWEEBIES"];
-const CATEGORIES: Category[] = ["Boys", "Girls", "Unisex"];
-const SEASONS: Season[] = [
-  "Summer 2025",
-  "Winter 2025",
-  "Spring 2025",
-  "Fall 2025",
-];
-const ITEM_TYPES: ItemType[] = [
-  "Shirt / Jacket",
-  "Shorts / Pants",
-  "T-shirt",
-  "Cap / Hat",
-  "Shoes",
-  "Other",
-];
-
-interface SetItem {
-  id: string;
-  name: string;
-  price: string;
-  type: ItemType;
-  category: Category;
-  sizes: Size[];
-  imageFile: File | null;
-  imagePreview: string | null;
-}
-
-interface SetFormData {
-  name: string;
-  brand: Brand;
-  category: Category;
-  season: Season;
-  description: string;
-  coverImageFile: File | null;
-  coverImagePreview: string | null;
-  items: SetItem[];
-}
-
-const makeItem = (): SetItem => ({
-  id: crypto.randomUUID(),
-  name: "",
-  price: "",
-  type: "T-shirt",
-  category: "Boys",
-  sizes: [],
-  imageFile: null,
-  imagePreview: null,
-});
-
-const INITIAL: SetFormData = {
-  name: "",
-  brand: "MOLO",
-  category: "Boys",
-  season: "Summer 2025",
-  description: "",
-  coverImageFile: null,
-  coverImagePreview: null,
-  items: [makeItem(), makeItem(), makeItem()],
-};
+const BRANDS = ["MOLO", "COSMO", "NORALEE", "SWEEBIES"];
 
 export default function SetProductForm() {
+  const token = getJwtToken();
   const [form, setForm] = useState<SetFormData>(INITIAL);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const coverRef = useRef<HTMLInputElement>(null);
 
   const totalPrice = form.items.reduce(
-    (sum, i) => sum + (parseFloat(i.price) || 0),
+    (sum, i) => sum + (i.productPrice || 0),
     0,
   );
 
@@ -102,6 +49,24 @@ export default function SetProductForm() {
     value: SetFormData[K],
   ) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function toggleAgeGroup(age: AgeGroup) {
+    setForm((prev) => ({
+      ...prev,
+      ageGroups: prev.ageGroups.includes(age)
+        ? prev.ageGroups.filter((a) => a !== age)
+        : [...prev.ageGroups, age],
+    }));
+  }
+
+  function toggleColor(color: ProductColor) {
+    setForm((prev) => ({
+      ...prev,
+      productColors: prev.productColors.includes(color)
+        ? prev.productColors.filter((c) => c !== color)
+        : [...prev.productColors, color],
+    }));
   }
 
   function handleCover(e: React.ChangeEvent<HTMLInputElement>) {
@@ -114,6 +79,7 @@ export default function SetProductForm() {
     }));
   }
 
+  // Item field setters
   function setItemField<K extends keyof SetItem>(
     id: string,
     key: K,
@@ -127,14 +93,7 @@ export default function SetProductForm() {
     }));
   }
 
-  function handleItemImage(id: string, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setItemField(id, "imageFile", file);
-    setItemField(id, "imagePreview", URL.createObjectURL(file));
-  }
-
-  function toggleSize(id: string, size: Size) {
+  function toggleItemSize(id: string, size: ClothingSize) {
     setForm((prev) => ({
       ...prev,
       items: prev.items.map((item) =>
@@ -150,6 +109,45 @@ export default function SetProductForm() {
     }));
   }
 
+  function toggleItemAgeGroup(id: string, age: AgeGroup) {
+    setForm((prev) => ({
+      ...prev,
+      items: prev.items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              ageGroups: item.ageGroups.includes(age)
+                ? item.ageGroups.filter((a) => a !== age)
+                : [...item.ageGroups, age],
+            }
+          : item,
+      ),
+    }));
+  }
+
+  function toggleItemColor(id: string, color: ProductColor) {
+    setForm((prev) => ({
+      ...prev,
+      items: prev.items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              productColors: item.productColors.includes(color)
+                ? item.productColors.filter((c) => c !== color)
+                : [...item.productColors, color],
+            }
+          : item,
+      ),
+    }));
+  }
+
+  function handleItemImage(id: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setItemField(id, "imageFile", file);
+    setItemField(id, "imagePreview", URL.createObjectURL(file));
+  }
+
   function addItem() {
     setForm((prev) => ({ ...prev, items: [...prev.items, makeItem()] }));
   }
@@ -160,21 +158,11 @@ export default function SetProductForm() {
       items: prev.items.filter((i) => i.id !== id),
     }));
   }
-
+ 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    try {
-      // TODO: API call here — createSetProduct(form)
-      await new Promise((r) => setTimeout(r, 800)); // placeholder
-      setSuccess(true);
-      setForm(INITIAL);
-    } catch (err) {
-      console.error(err);
-      alert("Xatolik yuz berdi.");
-    } finally {
-      setLoading(false);
-    }
+ 
   }
 
   if (success) {
@@ -194,58 +182,116 @@ export default function SetProductForm() {
         <p className={styles.sectionLabel}>Set details</p>
         <div className={styles.grid2}>
           <div className={styles.field}>
-            <label>Set name</label>
+            <label>Set title</label>
             <input
               type="text"
               placeholder="Summer Breeze Set"
-              value={form.name}
-              onChange={(e) => setField("name", e.target.value)}
+              value={form.productTitle}
+              onChange={(e) => setField("productTitle", e.target.value)}
               required
             />
           </div>
           <div className={styles.field}>
             <label>Brand</label>
             <select
-              value={form.brand}
-              onChange={(e) => setField("brand", e.target.value as Brand)}>
+              value={form.brandName}
+              onChange={(e) => setField("brandName", e.target.value)}>
               {BRANDS.map((b) => (
                 <option key={b}>{b}</option>
               ))}
             </select>
           </div>
         </div>
+
         <div className={styles.grid2}>
           <div className={styles.field}>
             <label>Category</label>
             <select
-              value={form.category}
+              value={form.productCategory}
               onChange={(e) =>
-                setField("category", e.target.value as Category)
-              }>
-              {CATEGORIES.map((c) => (
-                <option key={c}>{c}</option>
+                setField("productCategory", e.target.value as ProductCategory)
+              }
+              required>
+              {PRODUCT_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c.replace(/_/g, " ")}
+                </option>
               ))}
             </select>
           </div>
           <div className={styles.field}>
-            <label>Season</label>
+            <label>Gender</label>
             <select
-              value={form.season}
-              onChange={(e) => setField("season", e.target.value as Season)}>
-              {SEASONS.map((s) => (
-                <option key={s}>{s}</option>
+              value={form.gender}
+              onChange={(e) => setField("gender", e.target.value as Gender)}
+              required>
+              {GENDERS.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
               ))}
             </select>
           </div>
         </div>
+
+        <div className={styles.field}>
+          <label>Discount (%)</label>
+          <input
+            type="number"
+            min={0}
+            max={100}
+            placeholder="0"
+            value={form.productDiscount || ""}
+            onChange={(e) =>
+              setField("productDiscount", parseFloat(e.target.value) || 0)
+            }
+          />
+        </div>
+
         <div className={styles.field}>
           <label>Description</label>
           <textarea
             placeholder="Brief description of the set..."
-            value={form.description}
-            onChange={(e) => setField("description", e.target.value)}
+            value={form.productDesc}
+            onChange={(e) => setField("productDesc", e.target.value)}
             rows={3}
           />
+        </div>
+
+        {/* Age Groups */}
+        <div className={styles.field}>
+          <label>Age groups</label>
+          <div className={styles.sizes}>
+            {AGE_GROUPS.map((age) => (
+              <button
+                key={age}
+                type="button"
+                className={`${styles.sizeBtn} ${
+                  form.ageGroups.includes(age) ? styles.active : ""
+                }`}
+                onClick={() => toggleAgeGroup(age)}>
+                {age}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Colors */}
+        <div className={styles.field}>
+          <label>Colors</label>
+          <div className={styles.sizes}>
+            {PRODUCT_COLORS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                className={`${styles.sizeBtn} ${
+                  form.productColors.includes(color) ? styles.active : ""
+                }`}
+                onClick={() => toggleColor(color)}>
+                {color}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -314,13 +360,13 @@ export default function SetProductForm() {
 
             <div className={styles.grid2}>
               <div className={styles.field}>
-                <label>Name</label>
+                <label>Title</label>
                 <input
                   type="text"
                   placeholder="Stripe Shirt"
-                  value={item.name}
+                  value={item.productTitle}
                   onChange={(e) =>
-                    setItemField(item.id, "name", e.target.value)
+                    setItemField(item.id, "productTitle", e.target.value)
                   }
                   required
                 />
@@ -331,9 +377,13 @@ export default function SetProductForm() {
                   type="number"
                   min={0}
                   placeholder="65"
-                  value={item.price}
+                  value={item.productPrice || ""}
                   onChange={(e) =>
-                    setItemField(item.id, "price", e.target.value)
+                    setItemField(
+                      item.id,
+                      "productPrice",
+                      parseFloat(e.target.value) || 0,
+                    )
                   }
                   required
                 />
@@ -342,45 +392,104 @@ export default function SetProductForm() {
 
             <div className={styles.grid2}>
               <div className={styles.field}>
-                <label>Type</label>
+                <label>Product type</label>
                 <select
-                  value={item.type}
+                  value={item.productType}
                   onChange={(e) =>
-                    setItemField(item.id, "type", e.target.value as ItemType)
+                    setItemField(
+                      item.id,
+                      "productType",
+                      e.target.value as ProductType,
+                    )
                   }>
-                  {ITEM_TYPES.map((t) => (
-                    <option key={t}>{t}</option>
+                  {PRODUCT_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t.replace(/_/g, " ")}
+                    </option>
                   ))}
                 </select>
               </div>
               <div className={styles.field}>
                 <label>Category</label>
                 <select
-                  value={item.category}
+                  value={item.productCategory}
                   onChange={(e) =>
                     setItemField(
                       item.id,
-                      "category",
-                      e.target.value as Category,
+                      "productCategory",
+                      e.target.value as ProductCategory,
                     )
                   }>
-                  {CATEGORIES.map((c) => (
-                    <option key={c}>{c}</option>
+                  {PRODUCT_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c.replace(/_/g, " ")}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className={styles.field}>
+              <label>Gender</label>
+              <select
+                value={item.gender}
+                onChange={(e) =>
+                  setItemField(item.id, "gender", e.target.value as Gender)
+                }>
+                {GENDERS.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.field}>
               <label>Sizes</label>
               <div className={styles.sizes}>
-                {SIZE_OPTIONS.map((size) => (
+                {CLOTHING_SIZES.map((size) => (
                   <button
                     key={size}
                     type="button"
-                    className={`${styles.sizeBtn} ${item.sizes.includes(size) ? styles.active : ""}`}
-                    onClick={() => toggleSize(item.id, size)}>
+                    className={`${styles.sizeBtn} ${
+                      item.sizes.includes(size) ? styles.active : ""
+                    }`}
+                    onClick={() => toggleItemSize(item.id, size)}>
                     {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label>Age groups</label>
+              <div className={styles.sizes}>
+                {AGE_GROUPS.map((age) => (
+                  <button
+                    key={age}
+                    type="button"
+                    className={`${styles.sizeBtn} ${
+                      item.ageGroups.includes(age) ? styles.active : ""
+                    }`}
+                    onClick={() => toggleItemAgeGroup(item.id, age)}>
+                    {age}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label>Colors</label>
+              <div className={styles.sizes}>
+                {PRODUCT_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    className={`${styles.sizeBtn} ${
+                      item.productColors.includes(color) ? styles.active : ""
+                    }`}
+                    onClick={() => toggleItemColor(item.id, color)}>
+                    {color}
                   </button>
                 ))}
               </div>

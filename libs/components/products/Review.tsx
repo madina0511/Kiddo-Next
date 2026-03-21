@@ -3,10 +3,13 @@ import React from "react";
 import { Stack, Typography } from "@mui/material";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { Comment } from "../../types/comment/comment";
-import { REACT_APP_API_URL } from "../../config";
+
 import Moment from "react-moment";
 import { useRouter } from "next/router";
-import { userVar } from "@/libs/apollo/store";
+
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
+import { useReactiveVar } from "@apollo/client";
+import { userVar } from "@/apollo/store";
 // import { useReactiveVar } from "@apollo/client";
 // import { userVar } from "../../../apollo/store";
 
@@ -18,10 +21,10 @@ const Review = (props: ReviewProps) => {
   const { comment } = props;
   const device = useDeviceDetect();
   const router = useRouter();
-
+  const user = useReactiveVar(userVar);
   const [value, setValue] = React.useState<number | null>(2);
   const imagePath: string = comment?.memberData?.memberImage
-    ? `${REACT_APP_API_URL}/${comment?.memberData?.memberImage}`
+    ? `${NEXT_PUBLIC_API_URL}/${comment?.memberData?.memberImage}`
     : "/img/profile/defaultUser.svg";
 
   /** HANDLERS **/

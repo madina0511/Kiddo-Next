@@ -10,25 +10,28 @@ export const SIGN_UP = gql`
       _id
       memberType
       memberStatus
-      memberAuthType
       memberPhone
       memberNick
       memberFullName
       memberImage
       memberAddress
       memberDesc
+      memberProducts
+      memberArticles
+      memberFollowers
+      memberFollowings
+      memberLikes
+      memberPoints
+      memberViews
+      memberComments
+      memberRank
       memberWarnings
       memberBlocks
-      memberProperties
-      memberRank
-      memberArticles
-      memberPoints
-      memberLikes
-      memberViews
-      deletedAt
       createdAt
-      updatedAt
+      deletedAt
       accessToken
+      memberAuthType
+      brandName
     }
   }
 `;
@@ -39,6 +42,7 @@ export const LOGIN = gql`
       _id
       memberType
       memberStatus
+      brandName
       memberAuthType
       memberPhone
       memberNick
@@ -46,15 +50,19 @@ export const LOGIN = gql`
       memberImage
       memberAddress
       memberDesc
+      memberProducts
+      memberArticles
+      memberFollowers
+      memberFollowings
+      memberLikes
+      memberPoints
+      memberViews
+      memberComments
+      memberRank
       memberWarnings
       memberBlocks
-      memberProperties
-      memberRank
-      memberPoints
-      memberLikes
-      memberViews
-      deletedAt
       createdAt
+      deletedAt
       updatedAt
       accessToken
     }

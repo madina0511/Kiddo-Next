@@ -7,9 +7,10 @@ import { useReactiveVar } from "@apollo/client";
 import { userVar } from "../../../apollo/store";
 import PortraitIcon from "@mui/icons-material/Portrait";
 import IconButton from "@mui/material/IconButton";
-import { REACT_APP_API_URL } from "../../config";
+
 import { logOut } from "../../auth";
 import { sweetConfirmAlert } from "@/libs/types/sweetAlert";
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 
 const MyMenu = () => {
   const device = useDeviceDetect();
@@ -22,6 +23,7 @@ const MyMenu = () => {
   const logoutHandler = async () => {
     try {
       if (await sweetConfirmAlert("Do you want to logout?")) logOut();
+      router.push("/");
     } catch (err: any) {
       console.log("ERROR, logoutHandler:", err.message);
     }
@@ -37,7 +39,7 @@ const MyMenu = () => {
             <img
               src={
                 user?.memberImage
-                  ? `${REACT_APP_API_URL}/${user?.memberImage}`
+                  ? `${NEXT_PUBLIC_API_URL}/${user?.memberImage}`
                   : "/img/profile/defaultUser.svg"
               }
               alt={"member-photo"}

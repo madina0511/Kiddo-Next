@@ -181,6 +181,7 @@ export const logOut = () => {
 
 const deleteStorage = () => {
   localStorage.removeItem("accessToken");
+
   window.localStorage.setItem("logout", Date.now().toString());
 };
 

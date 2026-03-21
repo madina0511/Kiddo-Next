@@ -7,7 +7,7 @@ import {
   CommentInput,
   CommentsInquiry,
 } from "@/libs/types/comment/comment.input";
-import { REACT_APP_API_URL } from "@/libs/types/config";
+
 import { Member } from "@/libs/types/member/member";
 import { Product } from "@/libs/types/product/product";
 import { ProductsInquiry } from "@/libs/types/product/product.input";
@@ -22,6 +22,7 @@ import {
   sweetTopSmallSuccessAlert,
 } from "@/libs/types/sweetAlert";
 import { useReactiveVar } from "@apollo/client";
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 
 const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
   const device = useDeviceDetect();
@@ -104,7 +105,7 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
             <img
               src={
                 agent?.memberImage
-                  ? `${REACT_APP_API_URL}/${agent?.memberImage}`
+                  ? `${NEXT_PUBLIC_API_URL}/${agent?.memberImage}`
                   : "/img/profile/defaultUser.svg"
               }
               alt=""

@@ -1,7 +1,7 @@
 import { JournalPost, JournalPostDetail } from "./journal.types";
 
 const GQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_URL || "http://localhost:3000/graphql";
+  process.env.NEXT_PUBLIC_API_GRAPHQL_URL || "http://localhost:3000/graphql";
 
 // ── Mock data ─────────────────────────────────────────
 const MOCK_POSTS: JournalPost[] = [

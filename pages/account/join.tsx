@@ -52,12 +52,15 @@ const Join: NextPage = () => {
   const doLogin = useCallback(async () => {
     console.warn(input);
     try {
-      await logIn(input.nick, input.password);
+      const result = await logIn(input.nick, input.password);
+      console.log("login result:", result);
+      console.log("referrer:", router.query.referrer);
       await router.push(`${router.query.referrer ?? "/"}`);
     } catch (err: any) {
+      console.log("login error:", err);
       await sweetMixinErrorAlert(err.message);
     }
-  }, [input]);
+  }, [input, router]);
 
   const doSignUp = useCallback(async () => {
     console.warn(input);

@@ -12,7 +12,7 @@ import {
 import { BoardArticleCategory } from "../../enums/board-article.enum";
 
 import { getJwtToken } from "../../auth";
-import { REACT_APP_API_URL } from "../../config";
+
 import { useRouter } from "next/router";
 
 import "@toast-ui/editor/dist/toastui-editor.css";
@@ -26,6 +26,7 @@ import {
 } from "@/libs/types/sweetAlert";
 import { Editor } from "@toast-ui/react-editor";
 import { T } from "@/libs/common";
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 
 const TuiEditor = () => {
   const editorRef = useRef<Editor>(null),
@@ -70,7 +71,7 @@ const TuiEditor = () => {
       formData.append("0", image);
 
       const response = await axios.post(
-        `${process.env.REACT_APP_API_GRAPHQL_URL}`,
+        `${process.env.NEXT_PUBLIC_API_GRAPHQL_URL}`,
         formData,
         {
           headers: {
@@ -85,7 +86,7 @@ const TuiEditor = () => {
       console.log("=responseImage: ", responseImage);
       memoizedValues.articleImage = responseImage;
 
-      return `${REACT_APP_API_URL}/${responseImage}`;
+      return `${NEXT_PUBLIC_API_URL}/${responseImage}`;
     } catch (err) {
       console.log("Error, uploadImage:", err);
     }

@@ -27,7 +27,9 @@ const MyPage = () => {
   const category: any = router.query?.category ?? "myProfile";
 
   /** LIFECYCLES **/
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (!user?._id) router.push("/").then();
+  }, [user]);
 
   /** HANDLERS **/
   const likeMemberHandler = async (id: string, refetch: any, query: any) => {};
