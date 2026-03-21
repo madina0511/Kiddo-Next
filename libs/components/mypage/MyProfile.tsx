@@ -8,7 +8,12 @@ import { getJwtToken, updateStorage, updateUserInfo } from "../../auth";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { userVar } from "../../../apollo/store";
 import { MemberUpdate } from "@/libs/types/member/member.update";
-import { NEXT_PUBLIC_API_URL } from "@/libs/config";
+import { Messages, NEXT_PUBLIC_API_URL } from "@/libs/config";
+import { UPDATE_MEMBER } from "@/apollo/user/mutation";
+import {
+  sweetErrorHandling,
+  sweetMixinSuccessAlert,
+} from "@/libs/types/sweetAlert";
 
 const MyProfile = ({ initialValues, ...props }: any) => {
   const device = useDeviceDetect();
@@ -17,9 +22,17 @@ const MyProfile = ({ initialValues, ...props }: any) => {
   const [updateData, setUpdateData] = useState<MemberUpdate>(initialValues);
 
   /** APOLLO REQUESTS **/
-
+  const [updateMember] = useMutation(UPDATE_MEMBER);
   /** LIFECYCLES **/
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setUpdateData((prev) => ({
+      ...prev,
+      memberNick: user.memberNick,
+      memberPhone: user.memberPhone,
+      memberAddress: user.memberAddress,
+      memberImage: user.memberImage,
+    }));
+  }, [user]);
 
   /** HANDLERS **/
   const uploadImage = async (e: any) => {
@@ -70,6 +83,26 @@ const MyProfile = ({ initialValues, ...props }: any) => {
       console.log("Error, uploadImage:", err);
     }
   };
+  const updateProductHandler = useCallback(async () => {
+    try {
+      if (!user._id) throw new Error(Messages.error2);
+      updateData._id = user._id;
+
+      const result = await updateMember({
+        variables: {
+          input: updateData,
+        },
+      });
+
+      // @ts-ignore
+      const jwtToken = result.data.updateMember?.accessToken;
+      await updateStorage({ jwtToken });
+      updateUserInfo(result.data.updateMember?.accessToken);
+      await sweetMixinSuccessAlert("Information updated successfully.");
+    } catch (err: any) {
+      sweetErrorHandling(err).then();
+    }
+  }, [updateData]);
 
   const doDisabledCheck = () => {
     return (
@@ -132,10 +165,10 @@ const MyProfile = ({ initialValues, ...props }: any) => {
               <input
                 type="text"
                 placeholder="Your username"
-                // value={updateData.memberNick}
-                // onChange={({ target: { value } }) =>
-                //   setUpdateData({ ...updateData, memberNick: value })
-                // }
+                value={updateData.memberNick}
+                onChange={({ target: { value } }) =>
+                  setUpdateData({ ...updateData, memberNick: value })
+                }
               />
             </Stack>
             <Stack className="input-box">
@@ -143,10 +176,10 @@ const MyProfile = ({ initialValues, ...props }: any) => {
               <input
                 type="text"
                 placeholder="Your Phone"
-                // value={updateData.memberPhone}
-                // onChange={({ target: { value } }) =>
-                //   setUpdateData({ ...updateData, memberPhone: value })
-                // }
+                value={updateData.memberPhone}
+                onChange={({ target: { value } }) =>
+                  setUpdateData({ ...updateData, memberPhone: value })
+                }
               />
             </Stack>
           </Stack>
@@ -155,16 +188,16 @@ const MyProfile = ({ initialValues, ...props }: any) => {
             <input
               type="text"
               placeholder="Your address"
-              //   value={updateData.memberAddress}
-              //   onChange={({ target: { value } }) =>
-              //     setUpdateData({ ...updateData, memberAddress: value })
-              //   }
+              value={updateData.memberAddress}
+              onChange={({ target: { value } }) =>
+                setUpdateData({ ...updateData, memberAddress: value })
+              }
             />
           </Stack>
           <Stack className="about-me-box">
             <Button
               className="update-button"
-              //   onClick={updatePropertyHandler}
+              onClick={updateProductHandler}
               disabled={doDisabledCheck()}>
               <Typography>Update Profile</Typography>
               <svg

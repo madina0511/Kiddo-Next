@@ -68,3 +68,72 @@ export const LOGIN = gql`
     }
   }
 `;
+export const UPDATE_MEMBER = gql`
+  mutation UpdateMember($input: MemberUpdate!) {
+    updateMember(input: $input) {
+      _id
+      memberType
+      memberStatus
+      brandName
+      memberAuthType
+      memberPhone
+      memberNick
+      memberFullName
+      memberImage
+      memberAddress
+      memberDesc
+      memberProducts
+      memberArticles
+      memberFollowers
+      memberFollowings
+      memberLikes
+      memberPoints
+      memberViews
+      memberComments
+      memberRank
+      memberWarnings
+      memberBlocks
+      createdAt
+      deletedAt
+      updatedAt
+      accessToken
+    }
+  }
+`;
+
+export const LIKE_TARGET_MEMBER = gql`
+  mutation LikeTargetMember($input: String!) {
+    likeTargetMember(memberId: $input) {
+      _id
+      memberType
+      memberStatus
+      brandName
+      memberAuthType
+      memberPhone
+      memberNick
+      memberFullName
+      memberImage
+      memberAddress
+      memberDesc
+      memberProducts
+      memberArticles
+      memberFollowers
+      memberFollowings
+      memberLikes
+      memberPoints
+      memberViews
+      memberComments
+      memberRank
+      memberWarnings
+      memberBlocks
+      createdAt
+      deletedAt
+      updatedAt
+      accessToken
+    }
+  }
+`;
+
+/**************************
+ *        PRODUCT       *
+ *************************/
