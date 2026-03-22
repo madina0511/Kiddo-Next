@@ -43,7 +43,7 @@ const MyPage = () => {
       await sweetErrorHandling(error);
     }
   };
-
+  if (!user?._id) return null;
   if (device === "mobile") {
     return <div>MY PAGE</div>;
   } else {

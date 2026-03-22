@@ -3,6 +3,8 @@ import Head from "next/head";
 import Top from "../Top";
 import Footer from "../Footer";
 import BaseTop from "../BaseTop";
+import { useReactiveVar } from "@apollo/client";
+import { userVar } from "@/apollo/store";
 
 const withLayoutBase = (Component: any) => {
   return (props: any) => (
