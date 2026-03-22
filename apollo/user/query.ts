@@ -73,43 +73,7 @@ export const GET_AGENTS = gql`
     }
   }
 `;
-export const GET_ALL_MEMBERS_BY_ADMIN = gql`
-  query GetAllMembersByAdmin($input: MembersInquiry!) {
-    getAllMembersByAdmin(input: $input) {
-      list {
-        _id
-        memberType
-        memberStatus
-        brandName
-        memberAuthType
-        memberPhone
-        memberNick
-        memberFullName
-        memberImage
-        memberAddress
-        memberDesc
-        memberProducts
-        memberArticles
-        memberFollowers
-        memberFollowings
-        memberLikes
-        memberPoints
-        memberViews
-        memberComments
-        memberRank
-        memberWarnings
-        memberBlocks
-        createdAt
-        deletedAt
-        updatedAt
-        accessToken
-      }
-      metaCounter {
-        total
-      }
-    }
-  }
-`;
+
 /**************************
  *        PRODUCT       *
  *************************/

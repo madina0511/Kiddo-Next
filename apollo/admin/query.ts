@@ -1,0 +1,181 @@
+import { gql } from "@apollo/client";
+
+/**************************
+ *         MEMBER         *
+ *************************/
+
+export const GET_ALL_MEMBERS_BY_ADMIN = gql`
+  query GetAllMembersByAdmin($input: MembersInquiry!) {
+    getAllMembersByAdmin(input: $input) {
+      list {
+        _id
+        memberType
+        memberStatus
+        brandName
+        memberAuthType
+        memberPhone
+        memberNick
+        memberFullName
+        memberImage
+        memberAddress
+        memberDesc
+        memberProducts
+        memberArticles
+        memberFollowers
+        memberFollowings
+        memberLikes
+        memberPoints
+        memberViews
+        memberComments
+        memberRank
+        memberWarnings
+        memberBlocks
+        createdAt
+        deletedAt
+        updatedAt
+        accessToken
+      }
+      metaCounter {
+        total
+      }
+    }
+  }
+`;
+
+/**************************
+ *        PRODUCT       *
+ *************************/
+
+export const GET_ALL_PRODUCTS_BY_ADMIN = gql`
+  query GetAllProductsByAdmin($input: AllProductsInquiry!) {
+    getAllProductsByAdmin(input: $input) {
+      list {
+        _id
+        productType
+        setItems
+        productColors
+        productStatus
+        productCategory
+        ageGroup
+        size
+        productTitle
+        brandName
+        productPrice
+        gender
+        productDiscount
+        productViews
+        productLikes
+        productComments
+        productRank
+        productImages
+        productDesc
+        memberId
+        soldAt
+        deletedAt
+        constructedAt
+        createdAt
+        updatedAt
+      }
+      metaCounter {
+        total
+      }
+    }
+  }
+`;
+
+/**************************
+ *      BOARD-ARTICLE     *
+ *************************/
+
+export const GET_ALL_BOARD_ARTICLES_BY_ADMIN = gql`
+  query GetAllBoardArticlesByAdmin($input: AllBoardArticlesInquiry!) {
+    getAllBoardArticlesByAdmin(input: $input) {
+      list {
+        _id
+        articleCategory
+        articleStatus
+        articleTitle
+        articleContent
+        articleImage
+        articleViews
+        articleLikes
+        memberId
+        createdAt
+        updatedAt
+        memberData {
+          _id
+          memberType
+          memberStatus
+          memberAuthType
+          memberPhone
+          memberNick
+          memberFullName
+          memberImage
+          memberAddress
+          memberDesc
+          memberWarnings
+          memberBlocks
+          memberProperties
+          memberRank
+          memberPoints
+          memberLikes
+          memberViews
+          deletedAt
+          createdAt
+          updatedAt
+          accessToken
+        }
+      }
+      metaCounter {
+        total
+      }
+    }
+  }
+`;
+
+/**************************
+ *         COMMENT        *
+ *************************/
+
+export const GET_COMMENTS = gql`
+  query GetComments($input: CommentsInquiry!) {
+    getComments(input: $input) {
+      list {
+        _id
+        commentStatus
+        commentGroup
+        commentContent
+        commentRefId
+        memberId
+        createdAt
+        updatedAt
+        memberData {
+          _id
+          memberType
+          memberStatus
+          memberAuthType
+          memberPhone
+          memberNick
+          memberFullName
+          memberImage
+          memberAddress
+          memberDesc
+          memberWarnings
+          memberBlocks
+          memberProperties
+          memberRank
+          memberPoints
+          memberLikes
+          memberViews
+          deletedAt
+          createdAt
+          updatedAt
+          accessToken
+        }
+      }
+      metaCounter {
+        total
+      }
+    }
+  }
+`;
