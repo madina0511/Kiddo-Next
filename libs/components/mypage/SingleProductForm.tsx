@@ -40,7 +40,7 @@ const INITIAL: SingleFormData = {
   productType: ProductType.T_SHIRT,
   productCategory: ProductCategory.INDOORWEAR,
   size: [],
-  ageGroups: [],
+  ageGroup: [],
   gender: Gender.ALL,
   productTitle: "",
   brandName: BRANDS[0],
@@ -98,9 +98,9 @@ export default function SingleProductForm() {
   function toggleAgeGroup(age: AgeGroup) {
     setForm((prev) => ({
       ...prev,
-      ageGroups: prev.ageGroups.includes(age)
-        ? prev.ageGroups.filter((a) => a !== age)
-        : [...prev.ageGroups, age],
+      ageGroup: prev.ageGroup.includes(age)
+        ? prev.ageGroup.filter((a) => a !== age)
+        : [...prev.ageGroup, age],
     }));
   }
 
@@ -170,8 +170,8 @@ export default function SingleProductForm() {
           input: {
             productType: form.productType,
             productCategory: form.productCategory,
-            sizes: form.size,
-            ageGroups: form.ageGroups,
+            size: form.size,
+            ageGroup: form.ageGroup,
             gender: form.gender,
             productTitle: form.productTitle,
             brandName: form.brandName,
@@ -390,7 +390,7 @@ export default function SingleProductForm() {
               key={age}
               type="button"
               className={`${styles.sizeBtn} ${
-                form.ageGroups.includes(age) ? styles.active : ""
+                form.ageGroup.includes(age) ? styles.active : ""
               }`}
               onClick={() => toggleAgeGroup(age)}>
               {AGE_GROUP_LABELS[age]}

@@ -13,7 +13,7 @@ export interface SetItem {
   productType: ProductType;
   productCategory: ProductCategory;
   size: ClothingSize[];
-  ageGroups: AgeGroup[];
+  ageGroup: AgeGroup[];
   gender: Gender;
   productTitle: string;
   productPrice: number;
@@ -29,7 +29,7 @@ export interface SetFormData {
   brandName: string;
   productCategory: ProductCategory;
   gender: Gender;
-  ageGroups: AgeGroup[];
+  ageGroup: AgeGroup[];
   productColors: ProductColor[];
   productDiscount: number;
   productDesc: string;
@@ -43,7 +43,7 @@ export const makeItem = (): SetItem => ({
   productType: ProductType.T_SHIRT,
   productCategory: ProductCategory.INDOORWEAR,
   size: [],
-  ageGroups: [],
+  ageGroup: [],
   gender: Gender.ALL,
   productTitle: "",
   productPrice: 0,
@@ -58,7 +58,7 @@ export const INITIAL: SetFormData = {
   brandName: BRANDS[0],
   productCategory: ProductCategory.INDOORWEAR,
   gender: Gender.ALL,
-  ageGroups: [],
+  ageGroup: [],
   productColors: [],
   productDiscount: 0,
   productDesc: "",

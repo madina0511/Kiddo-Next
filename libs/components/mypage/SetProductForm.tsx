@@ -61,9 +61,9 @@ export default function SetProductForm() {
   function toggleAgeGroup(age: AgeGroup) {
     setForm((prev) => ({
       ...prev,
-      ageGroups: prev.ageGroups.includes(age)
-        ? prev.ageGroups.filter((a) => a !== age)
-        : [...prev.ageGroups, age],
+      ageGroup: prev.ageGroup.includes(age)
+        ? prev.ageGroup.filter((a) => a !== age)
+        : [...prev.ageGroup, age],
     }));
   }
 
@@ -123,9 +123,9 @@ export default function SetProductForm() {
         item.id === id
           ? {
               ...item,
-              ageGroups: item.ageGroups.includes(age)
-                ? item.ageGroups.filter((a) => a !== age)
-                : [...item.ageGroups, age],
+              ageGroup: item.ageGroup.includes(age)
+                ? item.ageGroup.filter((a) => a !== age)
+                : [...item.ageGroup, age],
             }
           : item,
       ),
@@ -231,8 +231,8 @@ export default function SetProductForm() {
         console.log("item input:", {
           productType: item.productType,
           productCategory: item.productCategory,
-          sizes: item.size,
-          ageGroups: item.ageGroups,
+          size: item.size,
+          ageGroup: item.ageGroup,
           gender: item.gender,
           productTitle: item.productTitle,
           productPrice: item.productPrice,
@@ -247,8 +247,8 @@ export default function SetProductForm() {
             input: {
               productType: item.productType,
               productCategory: item.productCategory,
-              sizes: item.size,
-              ageGroups: item.ageGroups,
+              size: item.size,
+              ageGroup: item.ageGroup,
               gender: item.gender,
               productTitle: item.productTitle,
               productPrice: item.productPrice,
@@ -299,8 +299,8 @@ export default function SetProductForm() {
           input: {
             productType: ProductType.SET,
             productCategory: form.productCategory,
-            sizes: [],
-            ageGroups: form.ageGroups,
+            size: [],
+            ageGroup: form.ageGroup,
             gender: form.gender,
             productTitle: form.productTitle,
             productPrice: totalPrice,
@@ -426,7 +426,7 @@ export default function SetProductForm() {
                 key={age}
                 type="button"
                 className={`${styles.sizeBtn} ${
-                  form.ageGroups.includes(age) ? styles.active : ""
+                  form.ageGroup.includes(age) ? styles.active : ""
                 }`}
                 onClick={() => toggleAgeGroup(age)}>
                 {AGE_GROUP_LABELS[age]}
@@ -628,7 +628,7 @@ export default function SetProductForm() {
                     key={age}
                     type="button"
                     className={`${styles.sizeBtn} ${
-                      item.ageGroups.includes(age) ? styles.active : ""
+                      item.ageGroup.includes(age) ? styles.active : ""
                     }`}
                     onClick={() => toggleItemAgeGroup(item.id, age)}>
                     {AGE_GROUP_LABELS[age]}

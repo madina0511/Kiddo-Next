@@ -11,10 +11,11 @@ import { AgentProductsInquiry } from "@/libs/types/product/product.input";
 import { Product } from "@/libs/types/product/product";
 import { ProductStatus } from "@/libs/enums/product.enum";
 import { T } from "@/libs/common";
-import { sweetConfirmAlert } from "@/libs/types/sweetAlert";
+import { sweetConfirmAlert, sweetErrorHandling } from "@/libs/types/sweetAlert";
 import ProductCard from "../products/productCard";
 import { GET_AGENT_PRODUCTS } from "@/apollo/user/query";
 import ProductListCard from "./ProductListCard";
+import { UPDATE_PRODUCT } from "@/apollo/user/mutation";
 
 const MyProducts = ({ initialInput, ...props }: any) => {
   const device = useDeviceDetect();
@@ -34,10 +35,16 @@ const MyProducts = ({ initialInput, ...props }: any) => {
   const router = useRouter();
 
   /** APOLLO REQUESTS **/
-
-  const { data, loading, error } = useQuery(GET_AGENT_PRODUCTS, {
+  const [updateProduct] = useMutation(UPDATE_PRODUCT);
+  const {
+    loading: getAgentProductsLoading,
+    data: getAgentProductsData,
+    error: getAgentProductsError,
+    refetch: getAgentProductsRefetch,
+  } = useQuery(GET_AGENT_PRODUCTS, {
     fetchPolicy: "network-only",
     variables: { input: searchFilter },
+    ssr: false,
     onCompleted: (data) => {
       setAgentProducts(data.getAgentProducts.list);
       setTotal(data.getAgentProducts.metaCounter[0]?.total ?? 0);
@@ -53,9 +60,41 @@ const MyProducts = ({ initialInput, ...props }: any) => {
     setSearchFilter({ ...searchFilter, search: { productStatus: value } });
   };
 
-  const deletePropertyHandler = async (id: string) => {};
+  const deleteProductHandler = async (id: string) => {
+    try {
+      if (await sweetConfirmAlert("are you sure to delete this product?")) {
+        await updateProduct({
+          variables: {
+            input: {
+              _id: id,
+              productStatus: "DELETE",
+            },
+          },
+        });
+        await getAgentProductsRefetch({ input: searchFilter });
+      }
+    } catch (err: any) {
+      await sweetErrorHandling(err);
+    }
+  };
 
-  const updatePropertyHandler = async (status: string, id: string) => {};
+  const updateProductHandler = async (status: string, id: string) => {
+    try {
+      if (await sweetConfirmAlert(`are you sure change to ${status} status?`)) {
+        await updateProduct({
+          variables: {
+            input: {
+              _id: id,
+              productStatus: status,
+            },
+          },
+        });
+        await getAgentProductsRefetch({ input: searchFilter });
+      }
+    } catch (err: any) {
+      await sweetErrorHandling(err);
+    }
+  };
 
   if (user?.memberType !== "AGENT") {
     router.back();
@@ -77,7 +116,7 @@ const MyProducts = ({ initialInput, ...props }: any) => {
         <Stack className="property-list-box">
           <Stack className="tab-name-box">
             <Typography
-              //   onClick={() => changeStatusHandler(productStatus.ACTIVE)}
+              onClick={() => changeStatusHandler(ProductStatus.ACTIVE)}
               className={
                 searchFilter.search.productStatus === "ACTIVE"
                   ? "active-tab-name"
@@ -86,7 +125,7 @@ const MyProducts = ({ initialInput, ...props }: any) => {
               On Sale
             </Typography>
             <Typography
-              //   onClick={() => changeStatusHandler(ProductStatus.SOLD)}
+              onClick={() => changeStatusHandler(ProductStatus.SOLD)}
               className={
                 searchFilter.search.productStatus === "SOLD"
                   ? "active-tab-name"
@@ -109,7 +148,7 @@ const MyProducts = ({ initialInput, ...props }: any) => {
             {agentProducts?.length === 0 ? (
               <div className={"no-data"}>
                 <img src="/img/icons/icoAlert.svg" alt="" />
-                <p>No Property found!</p>
+                <p>No Product found!</p>
               </div>
             ) : (
               agentProducts.map((product: Product) => {
@@ -117,8 +156,8 @@ const MyProducts = ({ initialInput, ...props }: any) => {
                   <ProductListCard
                     key={product._id}
                     product={product}
-                    deleteHandler={deletePropertyHandler}
-                    updateHandler={updatePropertyHandler}
+                    deleteHandler={deleteProductHandler}
+                    updateHandler={updateProductHandler}
                     showActions={
                       searchFilter.search.productStatus === ProductStatus.ACTIVE
                     }
@@ -139,7 +178,7 @@ const MyProducts = ({ initialInput, ...props }: any) => {
                   />
                 </Stack>
                 <Stack className="total-result">
-                  <Typography>{total} product available</Typography>
+                  <Typography>{total} products available</Typography>
                 </Stack>
               </Stack>
             )}

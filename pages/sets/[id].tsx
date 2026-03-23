@@ -15,7 +15,7 @@ import {
 import { products } from "@/libs/common";
 import withLayoutBase from "@/libs/components/layout/LayoutBase";
 
-const SIZES = ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"];
+const SIZE = ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"];
 
 const mockSet = {
   _id: "1",
@@ -29,21 +29,21 @@ const mockSet = {
       productName: "Stripe Shirt",
       productPrice: 65,
       productImage: "/img/sets/settshort.webp",
-      sizes: ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"],
+      size: ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"],
     },
     {
       _id: "p2",
       productName: "Linen Shorts",
       productPrice: 58,
       productImage: "/img/sets/jacketset1.webp",
-      sizes: ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"],
+      size: ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"],
     },
     {
       _id: "p3",
       productName: "Summer Cap",
       productPrice: 66,
       productImage: "/img/sets/jacketsetshort.webp",
-      sizes: ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"],
+      size: ["2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"],
     },
   ],
 };
@@ -118,7 +118,7 @@ const SetDetailPage = () => {
                       value={selectedSizes[product._id] ?? ""}
                       onChange={(e) => handleSizeChange(product._id, e)}
                       label="Size">
-                      {product.sizes?.map((item: string) => (
+                      {product.size?.map((item: string) => (
                         <MenuItem key={item} value={item}>
                           {item}
                         </MenuItem>
