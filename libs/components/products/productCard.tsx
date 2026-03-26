@@ -5,28 +5,24 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import styles from "@/scss/pc/products/productCard.module.scss";
 import { useRouter } from "next/router";
 import { useState } from "react";
-
-export interface ProductCardItem {
-  _id: string;
-  productTitle: string;
-  brandName: string;
-  productPrice: number;
-  productImages?: string[];
-  // productViews: number;
-  // productLikes: number;
-  meLiked?: { myFavorite: boolean }[];
-}
+import { useReactiveVar } from "@apollo/client";
+import { userVar } from "@/apollo/store";
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
+import { Product } from "@/libs/types/product/product";
 
 interface ProductCardProps {
-  product: ProductCardItem;
-  likeProductHandler: (id: string) => void;
+  product: Product;
+  likeProductHandler?: (user: any, productId: string) => void;
   myFavorites?: boolean;
   recentlyVisited?: boolean;
 }
 
 const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
   const router = useRouter();
-  const [isLiked, setIsLiked] = useState(
+  const user = useReactiveVar(userVar);
+
+  // ✅ meLiked to'g'ri o'qilmoqda + local state bilan optimistic update
+  const [isLiked, setIsLiked] = useState<boolean>(
     product?.meLiked?.[0]?.myFavorite ?? false,
   );
 
@@ -36,13 +32,20 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
       query: { id: productId },
     });
   };
-  const handleLike = () => {
-    setIsLiked((prev) => !prev); // local state o'zgaradi
-    likeProductHandler(product._id); // parent ga xabar beradi
-  };
 
-  const mainImage = product.productImages?.[0] || "/products/sweater_polo.avif";
-  const hoverImage = product.productImages?.[1] || mainImage;
+  const mainImage = product.productImages?.[0]
+    ? `${NEXT_PUBLIC_API_URL}/${product.productImages[0]}`
+    : "/products/sweater_polo.avif";
+
+  const hoverImage = product.productImages?.[1]
+    ? `${NEXT_PUBLIC_API_URL}/${product.productImages[1]}`
+    : mainImage;
+
+  const handleLike = () => {
+    // ✅ Optimistic update — server javobini kutmay UI yangilanadi
+    setIsLiked((prev) => !prev);
+    likeProductHandler?.(user, product._id);
+  };
 
   return (
     <Box style={{ textDecoration: "none", color: "inherit" }}>
@@ -72,24 +75,17 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
           </div>
 
           <div className={styles.view_like}>
-            <IconButton color="default">
-              <RemoveRedEyeIcon />
-            </IconButton>
-            <Typography className="view-cnt">
-              {/* {product?.productViews} */}
-            </Typography>
-
-            <IconButton
-              color="default"
-              onClick={() => likeProductHandler(product._id)}>
+            {/* ✅ handleLike orqali chaqirilmoqda */}
+            <IconButton color="default" onClick={handleLike}>
               {isLiked ? (
                 <FavoriteIcon style={{ color: "red" }} />
               ) : (
                 <FavoriteBorderIcon />
               )}
             </IconButton>
+
             <Typography className="view-cnt">
-              {/* {product?.productLikes} */}
+              {/* {product.productLikes} */}
             </Typography>
           </div>
         </div>

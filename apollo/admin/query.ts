@@ -115,7 +115,7 @@ export const GET_ALL_BOARD_ARTICLES_BY_ADMIN = gql`
           memberDesc
           memberWarnings
           memberBlocks
-          memberProperties
+          memberProducts
           memberRank
           memberPoints
           memberLikes
@@ -162,7 +162,7 @@ export const GET_COMMENTS = gql`
           memberDesc
           memberWarnings
           memberBlocks
-          memberProperties
+          memberProducts
           memberRank
           memberPoints
           memberLikes

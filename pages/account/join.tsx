@@ -49,20 +49,20 @@ const Join: NextPage = () => {
     });
   }, []);
 
-  const doLogin = useCallback(async () => {
-    console.warn(input);
+  const doLogin = async () => {
+    console.log("LOGIN INPUT:", input);
+
     try {
       const result = await logIn(input.nick, input.password);
       console.log("login result:", result);
-      console.log("referrer:", router.query.referrer);
+
       await router.push(`${router.query.referrer ?? "/"}`);
     } catch (err: any) {
       console.log("login error:", err);
       await sweetMixinErrorAlert(err.message);
     }
-  }, [input, router]);
-
-  const doSignUp = useCallback(async () => {
+  };
+  const doSignUp = async () => {
     console.warn(input);
     try {
       await signUp(
@@ -76,7 +76,7 @@ const Join: NextPage = () => {
     } catch (err: any) {
       await sweetMixinErrorAlert(err.message);
     }
-  }, [input]);
+  };
 
   console.log("+input: ", input);
 
@@ -105,6 +105,7 @@ const Join: NextPage = () => {
                   <span>Nickname</span>
                   <input
                     type="text"
+                    value={input.nick}
                     placeholder={"Enter Nickname"}
                     onChange={(e) => handleInput("nick", e.target.value)}
                     required={true}
@@ -118,6 +119,7 @@ const Join: NextPage = () => {
                   <span>Password</span>
                   <input
                     type="text"
+                    value={input.password}
                     placeholder={"Enter Password"}
                     onChange={(e) => handleInput("password", e.target.value)}
                     required={true}
@@ -132,6 +134,7 @@ const Join: NextPage = () => {
                     <span>Phone</span>
                     <input
                       type="text"
+                      value={input.phone}
                       placeholder={"Enter Phone"}
                       onChange={(e) => handleInput("phone", e.target.value)}
                       required={true}
@@ -146,6 +149,7 @@ const Join: NextPage = () => {
                     <span>Agent Code</span>
                     <input
                       type="text"
+                      value={input.agentCode}
                       placeholder={"Enter Agent Code"}
                       onChange={(e) => handleInput("agentCode", e.target.value)}
                       required={true}

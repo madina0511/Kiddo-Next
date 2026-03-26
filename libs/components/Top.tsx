@@ -16,6 +16,7 @@ import { userVar } from "@/apollo/store";
 import { getJwtToken, logOut, updateUserInfo } from "../auth";
 import { NEXT_PUBLIC_API_URL } from "../config";
 import { sweetConfirmAlert } from "../types/sweetAlert";
+import CartDrawer from "./CartDrawer";
 
 const Top = () => {
   const router = useRouter();
@@ -26,6 +27,8 @@ const Top = () => {
   const [logoutAnchor, setLogoutAnchor] = useState<null | HTMLElement>(null);
   const logoutOpen = Boolean(logoutAnchor);
   const [scrolled, setScrolled] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
   // Apollo
 
   // Effects
@@ -82,7 +85,7 @@ const Top = () => {
 
         {/* Desktop Menu */}
         <div className="desktopMenu">
-          <MegaMenuPopper label="Shop" />
+          <Link href="/products">Shop</Link>
           <Link href="/sets">Sets</Link>
           <BrandMenuPopper label="Brands" />
           <Link href="/kiddo-club">Kiddo Club</Link>
@@ -99,7 +102,7 @@ const Top = () => {
           </div>
 
           <div className="cartWrap">
-            <IconButton>
+            <IconButton onClick={() => setCartOpen(true)}>
               <Badge
                 badgeContent={4}
                 sx={{
@@ -111,6 +114,7 @@ const Top = () => {
                 <ShoppingCartOutlinedIcon />
               </Badge>
             </IconButton>
+            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
           </div>
 
           {/* ✅ USER BOX (Login/Register yoki Avatar+Logout) */}

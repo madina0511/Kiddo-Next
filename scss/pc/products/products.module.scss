@@ -3,37 +3,32 @@
   background: #fff;
   min-height: 100vh;
   padding: 24px 10px 80px;
-  box-sizing: border-ox;
+  box-sizing: border-box;
 }
 
+// ── Filters ──────────────────────────────────────────
 .categoryWrap {
-  padding: 0px 0px 0px;
   margin-bottom: 24px;
 }
 
-.category {
+.filterBar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-bottom: 18px;
-
-  a {
-    text-decoration: none;
-    color: #666666;
-    font-size: 14px;
-    font-weight: 400;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: #111111;
-    }
-  }
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .filterWrap {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.activeCategory {
+  color: #111111;
+  font-weight: 600;
+  border-bottom: 1.5px solid #111111;
+  padding-bottom: 2px;
 }
 
 .productCount {
@@ -50,6 +45,7 @@
   padding: 8px 18px !important;
   font-size: 13px !important;
   font-weight: 500 !important;
+  transition: all 0.2s ease !important;
 
   &:hover {
     background: #111111 !important;
@@ -58,16 +54,34 @@
   }
 }
 
+// ── Product grid ──────────────────────────────────────
 .productCards {
-  height: auto;
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 24px;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
   margin-bottom: 40px;
 }
+@media (max-width: 1200px) {
+  .productCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .productCards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.noData {
+  width: 100%;
+  text-align: center;
+  padding: 60px 0;
+  color: #666;
+  font-size: 15px;
+}
+
+// ── Pagination ────────────────────────────────────────
 .paginationConfig {
   width: 100%;
   margin-top: 40px;
@@ -75,12 +89,14 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  .paginationBox {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 }
+
+.paginationBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .totalResult {
   display: flex;
   justify-content: center;

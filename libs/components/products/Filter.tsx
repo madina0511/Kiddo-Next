@@ -10,40 +10,25 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import withLayoutBase from "./../../../pages/_admin/index";
 import styles from "@/scss/pc/products/filter.module.scss";
-
-const sizeGroup = [
-  "0-3M",
-  "3-6M",
-  "6-12M",
-  "12-18M",
-  "18-24M",
-  "2-3Y",
-  "4-5Y",
-  "6-7Y",
-  "8-9Y",
-  "10-11Y",
-];
-
-const genderGroup = ["Girls", "Boys"];
-
-const colorGroup = [
-  "Blue",
-  "Blush",
-  "Brown",
-  "Grey",
-  "Ivory",
-  "Pink",
-  "Yellow",
-  "Stripe",
-];
+import {
+  CLOTHING_SIZE_LABELS,
+  Gender,
+  ProductColor,
+} from "@/libs/enums/product.enum";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  onApply: (filters: {
+    sizes: string[];
+    genders: string[];
+    colors: string[];
+  }) => void;
 };
 
-const Filter = ({ open, onClose }: Props) => {
+const Filter = ({ open, onClose, onApply }: Props) => {
   const [openSize, setOpenSize] = useState(true);
   const [openGender, setOpenGender] = useState(true);
   const [openColor, setOpenColor] = useState(true);
@@ -112,16 +97,16 @@ const Filter = ({ open, onClose }: Props) => {
 
           <Collapse in={openSize}>
             <Box className={styles.tagWrap}>
-              {sizeGroup.map((item) => (
+              {Object.entries(CLOTHING_SIZE_LABELS).map(([key, label]) => (
                 <Button
-                  key={item}
+                  key={key}
                   className={`${styles.tagBtn} ${
-                    selectedSizes.includes(item) ? styles.activeTag : ""
+                    selectedSizes.includes(key) ? styles.activeTag : ""
                   }`}
                   onClick={() =>
-                    toggleSelect(item, selectedSizes, setSelectedSizes)
+                    toggleSelect(key, selectedSizes, setSelectedSizes)
                   }>
-                  {item}
+                  {label}
                 </Button>
               ))}
             </Box>
@@ -144,16 +129,16 @@ const Filter = ({ open, onClose }: Props) => {
 
           <Collapse in={openGender}>
             <Box className={styles.tagWrap}>
-              {genderGroup.map((item) => (
+              {Object.entries(Gender).map(([key, value]) => (
                 <Button
-                  key={item}
+                  key={key}
                   className={`${styles.tagBtn} ${
-                    selectedGenders.includes(item) ? styles.activeTag : ""
+                    selectedGenders.includes(key) ? styles.activeTag : ""
                   }`}
                   onClick={() =>
-                    toggleSelect(item, selectedGenders, setSelectedGenders)
+                    toggleSelect(key, selectedGenders, setSelectedGenders)
                   }>
-                  {item}
+                  {value}
                 </Button>
               ))}
             </Box>
@@ -176,16 +161,16 @@ const Filter = ({ open, onClose }: Props) => {
 
           <Collapse in={openColor}>
             <Box className={styles.tagWrap}>
-              {colorGroup.map((item) => (
+              {Object.entries(ProductColor).map(([key, value]) => (
                 <Button
-                  key={item}
+                  key={key}
                   className={`${styles.tagBtn} ${
-                    selectedColors.includes(item) ? styles.activeTag : ""
+                    selectedColors.includes(key) ? styles.activeTag : ""
                   }`}
                   onClick={() =>
-                    toggleSelect(item, selectedColors, setSelectedColors)
+                    toggleSelect(key, selectedColors, setSelectedColors)
                   }>
-                  {item}
+                  {value}
                 </Button>
               ))}
             </Box>
@@ -197,7 +182,18 @@ const Filter = ({ open, onClose }: Props) => {
             CLEAR ({totalSelected})
           </Button>
 
-          <Button className={styles.applyBtn}>APPLY</Button>
+          <Button
+            className={styles.applyBtn}
+            onClick={() => {
+              onApply({
+                sizes: selectedSizes,
+                genders: selectedGenders,
+                colors: selectedColors,
+              });
+              onClose();
+            }}>
+            APPLY
+          </Button>
         </Box>
       </Box>
     </Box>

@@ -44,7 +44,7 @@ export interface PISearch {
 
   categoryList?: ProductCategory[];
 
-  typeList?: ProductType[];
+  productType?: ProductType[];
 
   size?: ClothingSize[];
 

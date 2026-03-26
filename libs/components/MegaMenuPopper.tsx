@@ -9,11 +9,11 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
 type MegaItem = {
   title: string;
   subtitle?: string;
   href: string;
+  category: string;
 };
 
 type Props = {
@@ -30,26 +30,49 @@ export default function MegaMenuPopper({ label = "Shop", items }: Props) {
   const menuItems = useMemo<MegaItem[]>(
     () =>
       items ?? [
-        { title: "OUTERWEAR", subtitle: "0–16 Years", href: "/outerWear" },
-        { title: "INDOOWEAR", subtitle: "2–16 Years", href: "/girl" },
-
+        {
+          title: "OUTERWEAR",
+          subtitle: "0–16 Years",
+          href: "/outerWear",
+          category: "OUTERWEAR",
+        },
+        {
+          title: "INDOORWEAR",
+          subtitle: "2–16 Years",
+          href: "/girl",
+          category: "INDOORWEAR",
+        },
         {
           title: "Accessories",
           subtitle: "0–16 Years",
           href: "/accessories",
+          category: "ACCESSORIES",
         },
         {
           title: "Baby & Toddler",
           subtitle: "0–4 years",
           href: "/baby_toddler",
+          category: "BABY_TODDLER",
         },
-        { title: "Swimwear", subtitle: "0–16 Years", href: "/swimwear" },
+        {
+          title: "Swimwear",
+          subtitle: "0–16 Years",
+          href: "/swimwear",
+          category: "SWIMWEAR",
+        },
       ],
     [items],
   );
   // Handlers
   const categoryClickHandler = (category: string) => {
-    router.push(`/products?category=${category}`);
+    const input = {
+      page: 1,
+      limit: 6,
+      sort: "createdAt",
+      direction: "DESC",
+      search: { categoryList: [category] },
+    };
+    router.push(`/products?input=${encodeURIComponent(JSON.stringify(input))}`);
   };
   const handleOpen = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -105,7 +128,7 @@ export default function MegaMenuPopper({ label = "Shop", items }: Props) {
                 <Box
                   key={it.href}
                   className="megaItem"
-                  onClick={() => categoryClickHandler(it.title)}
+                  onClick={() => categoryClickHandler(it.category)}
                   sx={{ cursor: "pointer" }}>
                   <Stack spacing={0.5} alignItems="center">
                     <Typography className="megaTitle">{it.title}</Typography>

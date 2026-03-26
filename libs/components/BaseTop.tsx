@@ -15,6 +15,7 @@ import { userVar } from "@/apollo/store";
 import { getJwtToken, logOut, updateUserInfo } from "../auth";
 import { NEXT_PUBLIC_API_URL } from "../config";
 import { sweetConfirmAlert } from "../types/sweetAlert";
+import CartDrawer from "./CartDrawer";
 
 const Top = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const Top = () => {
   const user = useReactiveVar(userVar);
   const [logoutAnchor, setLogoutAnchor] = useState<null | HTMLElement>(null);
   const logoutOpen = Boolean(logoutAnchor);
+  const [cartOpen, setCartOpen] = useState(false);
   console.log(userVar());
   useEffect(() => {
     const jwt = getJwtToken();
@@ -56,7 +58,7 @@ const Top = () => {
         </Stack>
 
         <div className="desktopMenu">
-          <MegaMenuPopper label="Shop" />
+          <Link href="/products">Shop</Link>
           <Link href="/sets">Sets</Link>
           <BrandMenuPopper label="Brands" />
           <Link href="/kiddo-club">Kiddo Club</Link>
@@ -73,7 +75,7 @@ const Top = () => {
           </div>
 
           <div className="cartWrap">
-            <IconButton>
+            <IconButton onClick={() => setCartOpen(true)}>
               <Badge
                 badgeContent={4}
                 sx={{
@@ -85,6 +87,7 @@ const Top = () => {
                 <ShoppingCartOutlinedIcon />
               </Badge>
             </IconButton>
+            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
           </div>
 
           <Box
