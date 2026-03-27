@@ -3,114 +3,111 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Box, IconButton, Pagination, Stack, Typography } from "@mui/material";
 import withLayoutBase from "@/libs/components/layout/LayoutBase";
 import { useRouter } from "next/router";
-import { useState } from "react";
-
-const SETS_PER_PAGE = 6;
-
-const mockSets = [
-  {
-    _id: "1",
-    setName: "Summer Breeze Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Molo",
-  },
-  {
-    _id: "2",
-    setName: "Classic Everyday Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Cosmo",
-  },
-  {
-    _id: "3",
-    setName: "Cozy Winter Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Noralee",
-  },
-  {
-    _id: "4",
-    setName: "Playful Day Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Sweebies",
-  },
-  {
-    _id: "5",
-    setName: "Spring Fresh Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Molo",
-  },
-  {
-    _id: "6",
-    setName: "Autumn Warm Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Cosmo",
-  },
-  {
-    _id: "7",
-    setName: "Party Look Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Noralee",
-  },
-  {
-    _id: "8",
-    setName: "Weekend Chill Set",
-    setImage: "/img/sets/jacketset.webp",
-    brand: "Sweebies",
-  },
-];
+import { useEffect, useState } from "react";
+import { Product } from "@/libs/types/product/product";
+import { ProductType } from "@/libs/enums/product.enum";
+import { T } from "@/libs/common";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_PRODUCTS } from "@/apollo/user/query";
+import { LIKE_TARGET_PRODUCT } from "@/apollo/user/mutation";
+import { userVar } from "@/apollo/store";
+import { Message } from "@/libs/enums/common.enum";
+import { sweetMixinErrorAlert } from "@/libs/types/sweetAlert";
 
 const SetsPage = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [likedSets, setLikedSets] = useState<Record<string, boolean>>({});
-
-  const totalPages = Math.ceil(mockSets.length / SETS_PER_PAGE);
-  const currentSets = mockSets.slice(
-    (page - 1) * SETS_PER_PAGE,
-    page * SETS_PER_PAGE,
-  );
+  const [sets, setSets] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [searchFilter, setSearchFilter] = useState({
+    page: 1,
+    limit: 6,
+    sort: "createdAt",
+    direction: "DESC",
+    search: { productType: [ProductType.SET] },
+  });
+  const totalPages = Math.ceil(total / page);
 
   // Apollo
+  const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
+  const {
+    loading: getProductsLoading,
+    data: getProductsData,
+    refetch: getProductsRefetch,
+  } = useQuery(GET_PRODUCTS, {
+    fetchPolicy: "network-only",
+    variables: { input: searchFilter },
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (data: T) => {
+      setSets(data?.getProducts?.list);
+      console.log("set", sets);
+      setTotal(data?.getProducts?.metaCounter[0]?.total);
+    },
+  });
 
   // Effects
+  useEffect(() => {
+    //BACKEND REFETCH
+    // getProductsRefech({ input: searchFilter }).then();
+    console.log("++++searchFilter", searchFilter);
+  }, [searchFilter]);
 
   // Handlers
-  const likeProductHandler = (e: React.MouseEvent, setId: string) => {
-    e.stopPropagation(); // detail pagega o'tmasin
-    setLikedSets((prev) => ({ ...prev, [setId]: !prev[setId] }));
+  const likeProductHandler = async (e: React.MouseEvent, setId: string) => {
+    e.stopPropagation();
+    try {
+      if (!userVar()?._id) throw new Error(Message.NOT_AUTHENTICATED);
+      await likeTargetProduct({ variables: { input: setId } });
+      setLikedSets((prev) => ({ ...prev, [setId]: !prev[setId] }));
+    } catch (err: any) {
+      sweetMixinErrorAlert(err.message);
+    }
   };
 
   return (
     <Box className="sets-page">
       <Box className="sets-container">
-        <Typography className="sets-count">({mockSets.length} sets)</Typography>
+        <Typography className="sets-count">({sets.length} sets)</Typography>
 
         <Box className="sets-grid">
-          {currentSets.map((set) => (
-            <Box
-              key={set._id}
-              className="set-card"
-              onClick={() => router.push(`/sets/${set._id}`)}>
-              <img
-                src={set.setImage}
-                alt={set.setName}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "/img/banner/header1.svg";
-                }}
-              />
+          {sets.map((set) => {
+            const imageSrc = set.productImages?.[0]
+              ? `${process.env.NEXT_PUBLIC_API_URL}/${set.productImages[0]}`
+              : "/img/banner/joinbaby.webp";
+            console.log(
+              "SERVER:",
+              process.env.NEXT_PUBLIC_SERVER_URL,
+              "IMAGE:",
+              set.productImages?.[0],
+            );
+            return (
+              <Box
+                key={set._id}
+                className="set-card"
+                onClick={() => router.push(`/sets/${set._id}`)}>
+                <img
+                  src={imageSrc}
+                  alt={set.productTitle}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.onerror = null;
+                    target.src = "/img/banner/joinbaby.webp";
+                  }}
+                />
 
-              {/* Like tugmasi — yuqori o'ng burchak */}
-              <IconButton
-                className="set-like-btn"
-                onClick={(e) => likeProductHandler(e, set._id)}>
-                {likedSets[set._id] ? (
-                  <FavoriteIcon className="liked" />
-                ) : (
-                  <FavoriteBorderIcon className="not-liked" />
-                )}
-              </IconButton>
-            </Box>
-          ))}
+                <IconButton
+                  className="set-like-btn"
+                  onClick={(e) => likeProductHandler(e, set._id)}>
+                  {likedSets[set._id] ? (
+                    <FavoriteIcon className="liked" />
+                  ) : (
+                    <FavoriteBorderIcon className="not-liked" />
+                  )}
+                </IconButton>
+              </Box>
+            );
+          })}
         </Box>
 
         {totalPages > 1 && (

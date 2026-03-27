@@ -38,6 +38,7 @@ export interface Product {
   productImages?: string[];
   productDesc?: string;
   memberId: string;
+  setItems?: string[];
   soldAt?: Date;
 
   /* from aggregation*/
