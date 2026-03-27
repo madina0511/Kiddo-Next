@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@apollo/client";
 import { GET_PRODUCT } from "@/apollo/user/query";
@@ -10,20 +10,18 @@ import SetItemCard from "@/libs/components/sets/setItemCard";
 
 const SetDetailPage = () => {
   const router = useRouter();
-  const id = router.query.id as string;
+  const { id } = router.query as { id: string };
   const [set, setSet] = useState<Product | null>(null);
 
-  useQuery(GET_PRODUCT, {
+  const { data } = useQuery(GET_PRODUCT, {
     fetchPolicy: "network-only",
     variables: { input: id },
     skip: !router.isReady || !id,
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      if (data?.getProduct) {
-        setSet(data.getProduct);
-      }
-    },
   });
+
+  useEffect(() => {
+    if (data?.getProduct) setSet(data.getProduct);
+  }, [data]);
 
   if (!set) return null;
 
@@ -34,7 +32,7 @@ const SetDetailPage = () => {
           <img
             src={
               set.productImages?.[0]
-                ? `${process.env.NEXT_PUBLIC_SERVER_URL}/${set.productImages[0]}`
+                ? `${process.env.NEXT_PUBLIC_API_URL}/${set.productImages[0]}`
                 : "/img/banner/header1.svg"
             }
             alt={set.productTitle}

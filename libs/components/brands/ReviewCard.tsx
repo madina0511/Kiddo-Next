@@ -4,13 +4,18 @@ import { Stack, Box, Typography } from "@mui/material";
 import { Comment } from "../../types/comment/comment";
 import Moment from "react-moment";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config";
+import { useReactiveVar } from "@apollo/client";
+import { userVar } from "@/apollo/store";
 
 interface ReviewCardProps {
   fromMyPage?: string;
   comment: Comment;
+  userId?: string;
+  deleteCommentHandler?: (commentId: string) => Promise<void>;
 }
 const ReviewCard = (props: ReviewCardProps) => {
-  const { fromMyPage, comment } = props;
+  const user = useReactiveVar(userVar);
+  const { fromMyPage, comment, deleteCommentHandler } = props;
   const device = useDeviceDetect();
   const imagePath: string = comment?.memberData?.memberImage
     ? `${NEXT_PUBLIC_API_URL}/${comment?.memberData?.memberImage}`
@@ -19,6 +24,7 @@ const ReviewCard = (props: ReviewCardProps) => {
   if (device === "mobile") {
     return <div>REVIEW CARD</div>;
   } else {
+    console.log("user id:", user?._id, "comment memberId:", comment.memberId);
     return (
       <Box component={"div"} className={"review-card"}>
         <div className={"info"}>
@@ -33,6 +39,13 @@ const ReviewCard = (props: ReviewCardProps) => {
           </div>
         </div>
         <p>{comment.commentContent}</p>
+        {user?._id === comment.memberId && (
+          <Typography
+            onClick={() => deleteCommentHandler?.(comment._id)}
+            sx={{ cursor: "pointer", fontSize: "12px", color: "#999", mt: 1 }}>
+            Delete
+          </Typography>
+        )}
         {fromMyPage && (
           <Stack className="reply-button-box">
             <svg

@@ -15,6 +15,8 @@ import { userVar } from "@/apollo/store";
 
 interface ReviewProps {
   comment: Comment;
+  userId?: string;
+  deleteCommentHandler: (commentId: string) => Promise<void>;
 }
 
 const Review = (props: ReviewProps) => {
@@ -58,6 +60,18 @@ const Review = (props: ReviewProps) => {
           <Typography className={"description"}>
             {comment.commentContent}
           </Typography>
+          {user?._id === comment.memberId && (
+            <Typography
+              onClick={() => props.deleteCommentHandler(comment._id)}
+              sx={{
+                cursor: "pointer",
+                fontSize: "12px",
+                color: "#999",
+                mt: 1,
+              }}>
+              Delete
+            </Typography>
+          )}
         </Stack>
       </Stack>
     );

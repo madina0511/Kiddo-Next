@@ -23,12 +23,17 @@ import {
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import withLayoutBase from "@/libs/components/layout/LayoutBase";
-import { CREATE_COMMENT, LIKE_TARGET_PRODUCT } from "@/apollo/user/mutation";
+import {
+  CREATE_COMMENT,
+  LIKE_TARGET_PRODUCT,
+  UPDATE_COMMENT,
+} from "@/apollo/user/mutation";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_COMMENTS, GET_PRODUCT, GET_PRODUCTS } from "@/apollo/user/query";
 import { Product } from "@/libs/types/product/product";
 import { Direction } from "@/libs/enums/common.enum";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config"; // ✅ import qo'shildi
+import { userVar } from "@/apollo/store";
 
 // ✅ defaultProps o'rniga to'g'ridan-to'g'ri initial value
 const initialComment: CommentsInquiry = {
@@ -64,6 +69,7 @@ const ProductDetail = () => {
 
   const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
   const [createComment] = useMutation(CREATE_COMMENT);
+  const [updateComment] = useMutation(UPDATE_COMMENT);
 
   useEffect(() => {
     const id = router.query.id as string | undefined;
@@ -71,32 +77,29 @@ const ProductDetail = () => {
     setProductId(id);
   }, [router.query.id]);
 
-  const { loading: getProductLoading } = useQuery(GET_PRODUCT, {
-    fetchPolicy: "network-only",
-    variables: { input: productId },
-    skip: !productId,
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      const fetchedProduct = data?.getProduct;
-      if (!fetchedProduct) return;
-
-      setSelectedProduct(fetchedProduct);
-
-      // ✅ prev.search undefined bo'lsa himoyalandi
-      setCommentInquiry((prev) => ({
-        ...prev,
-        search: {
-          ...(prev.search ?? {}),
-          commentRefId: fetchedProduct._id,
-        },
-      }));
-
-      setInsertCommentData((prev) => ({
-        ...prev,
-        commentRefId: fetchedProduct._id,
-      }));
+  const { loading: getProductLoading, data: productData } = useQuery(
+    GET_PRODUCT,
+    {
+      fetchPolicy: "network-only",
+      variables: { input: productId },
+      skip: !productId,
+      notifyOnNetworkStatusChange: true,
     },
-  });
+  );
+
+  useEffect(() => {
+    const fetchedProduct = productData?.getProduct;
+    if (!fetchedProduct) return;
+    setSelectedProduct(fetchedProduct);
+    setCommentInquiry((prev) => ({
+      ...prev,
+      search: { ...(prev.search ?? {}), commentRefId: fetchedProduct._id },
+    }));
+    setInsertCommentData((prev) => ({
+      ...prev,
+      commentRefId: fetchedProduct._id,
+    }));
+  }, [productData]);
 
   const { data: getProductsData, refetch: getProductsRefetch } = useQuery(
     GET_PRODUCTS,
@@ -116,20 +119,21 @@ const ProductDetail = () => {
     },
   );
 
-  const { refetch: getCommentsRefetch } = useQuery(GET_COMMENTS, {
-    fetchPolicy: "cache-and-network",
-    variables: {
-      input: commentInquiry,
+  const { data: commentsData, refetch: getCommentsRefetch } = useQuery(
+    GET_COMMENTS,
+    {
+      fetchPolicy: "cache-and-network",
+      variables: { input: commentInquiry },
+      skip: !commentInquiry?.search?.commentRefId,
+      notifyOnNetworkStatusChange: true,
     },
-    skip: !commentInquiry?.search?.commentRefId,
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      if (data?.getComments?.list) {
-        setProductComments(data.getComments.list);
-      }
-      setCommentTotal(data?.getComments?.metaCounter?.[0]?.total ?? 0);
-    },
-  });
+  );
+
+  useEffect(() => {
+    if (!commentsData) return;
+    setProductComments(commentsData?.getComments?.list || []);
+    setCommentTotal(commentsData?.getComments?.metaCounter?.[0]?.total ?? 0);
+  }, [commentsData]);
 
   const products: Product[] = getProductsData?.getProducts?.list ?? [];
 
@@ -158,7 +162,21 @@ const ProductDetail = () => {
       console.log("like product error:", error);
     }
   };
-
+  const deleteCommentHandler = async (commentId: string) => {
+    try {
+      await updateComment({
+        variables: {
+          input: {
+            _id: commentId,
+            commentStatus: "DELETE",
+          },
+        },
+      });
+      await getCommentsRefetch({ input: commentInquiry });
+    } catch (err: any) {
+      console.log("delete comment error:", err);
+    }
+  };
   const handleSizeChange = (event: SelectChangeEvent) => {
     setSelectedSize(event.target.value);
   };
@@ -184,7 +202,7 @@ const ProductDetail = () => {
           input: insertCommentData,
         },
       });
-
+      console.log("COMMENT DATA:", insertCommentData);
       setInsertCommentData((prev) => ({
         ...prev,
         commentContent: "",
@@ -363,7 +381,12 @@ const ProductDetail = () => {
 
             <Stack className={"review-list"}>
               {productComments.map((comment: Comment) => (
-                <Review comment={comment} key={comment._id} />
+                <Review
+                  comment={comment}
+                  key={comment._id}
+                  userId={userVar()?._id}
+                  deleteCommentHandler={deleteCommentHandler}
+                />
               ))}
 
               <Box component={"div"} className={"pagination-box"}>

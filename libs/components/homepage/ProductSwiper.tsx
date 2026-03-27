@@ -6,22 +6,36 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import { Stack } from "@mui/material";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { GET_PRODUCTS } from "@/apollo/user/query";
+import { useQuery } from "@apollo/client";
+import { Product } from "@/libs/types/product/product";
+import { useRouter } from "next/router";
+import { ProductType } from "@/libs/enums/product.enum";
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 
 const ProductSwiper = () => {
   const swiperRef = useRef<any>(null);
-  const [products] = useState([
-    { id: 1, name: "Kids T-shirt", price: "$20", link: "/product/1" },
-    { id: 2, name: "Baby Jacket", price: "$35", link: "/product/2" },
-    { id: 3, name: "Kids Jeans", price: "$40", link: "/product/3" },
-    { id: 4, name: "Kids Hoodie", price: "$30", link: "/product/4" },
-    { id: 5, name: "Kids Coat", price: "$45", link: "/product/5" },
-    { id: 6, name: "Kids T-shirt", price: "$20", link: "/product/6" },
-    { id: 7, name: "Baby Jacket", price: "$35", link: "/product/7" },
-    { id: 8, name: "Kids Jeans", price: "$40", link: "/product/8" },
-    { id: 9, name: "Kids Hoodie", price: "$30", link: "/product/9" },
-    { id: 10, name: "Kids Coat", price: "$45", link: "/product/10" },
-  ]);
+  const router = useRouter();
+  const [sets, setSets] = useState<Product[]>([]);
+
+  const { data } = useQuery(GET_PRODUCTS, {
+    fetchPolicy: "network-only",
+    variables: {
+      input: {
+        page: 1,
+        limit: 10,
+        sort: "createdAt",
+        direction: "DESC",
+        search: { productType: [ProductType.SET] },
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (!data) return;
+    setSets(data?.getProducts?.list || []);
+  }, [data]);
 
   return (
     <Stack className="product-wrap">
@@ -38,20 +52,27 @@ const ProductSwiper = () => {
           pauseOnMouseEnter: true,
         }}
         onSwiper={(swiper) => (swiperRef.current = swiper)}>
-        {products.map((product) => (
-          <SwiperSlide key={product.id}>
-            <Link href={product.link}>
-              <div
-                className="card"
-                onMouseEnter={() => swiperRef.current?.autoplay.stop()}
-                onMouseLeave={() => swiperRef.current?.autoplay.start()}>
-                <img src="/img/banner/unity.jpg" alt={product.name} />
-                <div className="text">
-                  <h3>{product.name}</h3>
-                  <p>{product.price}</p>
-                </div>
+        {sets.map((set) => (
+          <SwiperSlide key={set._id}>
+            <div
+              className="card"
+              onClick={() => router.push(`/sets/${set._id}`)}
+              onMouseEnter={() => swiperRef.current?.autoplay.stop()}
+              onMouseLeave={() => swiperRef.current?.autoplay.start()}
+              style={{ cursor: "pointer" }}>
+              <img
+                src={`${process.env.NEXT_PUBLIC_API_URL}/${set.productImages?.[0]}`}
+                alt={set.productTitle}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/img/banner/joinbaby.webp";
+                }}
+              />
+              <div className="text">
+                <h3>{set.productTitle}</h3>
+                <p>${set.productPrice}</p>
               </div>
-            </Link>
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>
