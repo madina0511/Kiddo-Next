@@ -27,6 +27,7 @@ import {
 import { Editor } from "@toast-ui/react-editor";
 import { T } from "@/libs/common";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config";
+import { CREATE_BOARD_ARTICLE } from "@/apollo/user/mutation";
 
 const TuiEditor = () => {
   const editorRef = useRef<Editor>(null),
@@ -37,7 +38,7 @@ const TuiEditor = () => {
   );
 
   /** APOLLO REQUESTS **/
-
+  const [createboardArticle] = useMutation(CREATE_BOARD_ARTICLE);
   const memoizedValues = useMemo(() => {
     const articleTitle = "",
       articleContent = "",
@@ -112,6 +113,12 @@ const TuiEditor = () => {
         memoizedValues.articleTitle === ""
       )
         throw new Error(Message.INSERT_ALL_INPUTS);
+
+      await createboardArticle({
+        variables: {
+          input: { ...memoizedValues, articleCategory },
+        },
+      });
 
       await sweetTopSuccessAlert("Article is created successfully.", 700);
       await router.push({

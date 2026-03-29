@@ -10,8 +10,14 @@ import { BoardArticleCategory } from "../../libs/enums/board-article.enum";
 import { Messages } from "../../libs/config";
 import withLayoutBase from "@/libs/components/layout/LayoutBase";
 import { T } from "@/libs/common";
-import { sweetMixinErrorAlert } from "@/libs/types/sweetAlert";
+import {
+  sweetMixinErrorAlert,
+  sweetTopSmallSuccessAlert,
+} from "@/libs/types/sweetAlert";
 import { Direction } from "@/libs/enums/common.enum";
+import { GET_BOARD_ARTICLES } from "@/apollo/user/query";
+import { useMutation, useQuery } from "@apollo/client";
+import { LIKE_TARGET_BOARD_ARTICLE } from "@/apollo/user/mutation";
 
 const defaultCommunityInput: BoardArticlesInquiry = {
   page: 1,
@@ -47,58 +53,77 @@ const Community = ({ initialInput = defaultCommunityInput }: T) => {
   const [boardArticles, setBoardArticles] = useState<BoardArticle[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
 
+  /** APOLLO REQUESTS **/
+
+  const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
+
+  const {
+    loading: boardArticlesLoading,
+    data: boardArticlesData,
+    error: getBoardArticlesError,
+    refetch: boardArticlesRefetch,
+  } = useQuery(GET_BOARD_ARTICLES, {
+    fetchPolicy: "cache-and-network",
+    variables: {
+      input: searchCommunity,
+    },
+    notifyOnNetworkStatusChange: true,
+    onCompleted: (data: T) => {
+      setBoardArticles(data?.getBoardArticles?.list);
+      setTotalCount(data?.getBoardArticles?.metaCounter[0]?.total);
+    },
+  });
+
+  /** LIFECYCLES **/
   useEffect(() => {
-    if (!query?.articleCategory) {
+    if (!query?.articleCategory)
       router.push(
         {
           pathname: router.pathname,
           query: { articleCategory: "FREE" },
         },
-        undefined,
+        router.pathname,
         { shallow: true },
       );
-      return;
-    }
+  }, []);
 
-    setSearchCommunity((prev) => ({
-      ...prev,
-      page: 1,
-      search: {
-        ...prev.search,
-        articleCategory: query.articleCategory as BoardArticleCategory,
-      },
-    }));
-  }, [query?.articleCategory, router]);
-
+  /** HANDLERS **/
   const tabChangeHandler = async (e: T, value: string) => {
-    setSearchCommunity((prev) => ({
-      ...prev,
-      page: 1,
-      search: {
-        ...prev.search,
-        articleCategory: value as BoardArticleCategory,
-      },
-    }));
+    console.log(value);
 
+    setSearchCommunity({
+      ...searchCommunity,
+      page: 1,
+      search: { articleCategory: value as BoardArticleCategory },
+    });
     await router.push(
       {
         pathname: "/kiddo-club",
         query: { articleCategory: value },
       },
-      undefined,
+      router.pathname,
       { shallow: true },
     );
   };
 
   const paginationHandler = (e: T, value: number) => {
-    setSearchCommunity((prev) => ({ ...prev, page: value }));
+    setSearchCommunity({ ...searchCommunity, page: value });
   };
 
   const likeArticleHandler = async (e: any, user: any, id: string) => {
     try {
       e.stopPropagation();
       if (!id) return;
-      if (!user?._id) throw new Error(Messages.error2);
+      if (!user._id) throw new Error(Messages.error2);
+
+      await likeTargetBoardArticle({
+        variables: {
+          input: id,
+        },
+      });
+
+      await boardArticlesRefetch({ input: searchCommunity });
+      await sweetTopSmallSuccessAlert("success", 800);
     } catch (err: any) {
       console.log("ERROR, likePropertyHandler:", err.message);
       sweetMixinErrorAlert(err.message).then();

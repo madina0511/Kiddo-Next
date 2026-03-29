@@ -36,9 +36,21 @@ import { BoardArticle } from "../../libs/types/board-article/board-article";
 
 import { Messages } from "../../libs/config";
 import { CommentUpdate } from "../../libs/types/comment/comment.update";
-import { sweetMixinErrorAlert } from "@/libs/types/sweetAlert";
+import {
+  sweetConfirmAlert,
+  sweetMixinErrorAlert,
+  sweetMixinSuccessAlert,
+  sweetTopSmallSuccessAlert,
+} from "@/libs/types/sweetAlert";
 import { T } from "@/libs/common";
 import withLayoutBase from "@/libs/components/layout/LayoutBase";
+import { GET_COMMENTS } from "@/apollo/admin/query";
+import { GET_BOARD_ARTICLE } from "@/apollo/user/query";
+import {
+  CREATE_COMMENT,
+  LIKE_TARGET_BOARD_ARTICLE,
+  UPDATE_COMMENT,
+} from "@/apollo/user/mutation";
 
 const ToastViewerComponent = dynamic(
   () => import("../../libs/components/community/TViewer"),
@@ -76,6 +88,48 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
   const [boardArticle, setBoardArticle] = useState<BoardArticle>();
 
   /** APOLLO REQUESTS **/
+  /** APOLLO REQUESTS **/
+  const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
+  const [createComment] = useMutation(CREATE_COMMENT);
+  const [updateComment] = useMutation(UPDATE_COMMENT);
+
+  const {
+    loading: boardArticleLoading,
+    data: boardArticleData,
+    error: getBoardArticleError,
+    refetch: boardArticleRefetch,
+  } = useQuery(GET_BOARD_ARTICLE, {
+    fetchPolicy: "network-only",
+    variables: {
+      input: articleId,
+    },
+    notifyOnNetworkStatusChange: true,
+    onCompleted(data: any) {
+      setBoardArticle(data?.getBoardArticle);
+      if (data?.getBoardArticle?.memberData?.memberImage) {
+        setMemberImage(
+          `${process.env.REACT_APP_API_URL}/${data?.getBoardArticle?.memberData?.memberImage}`,
+        );
+      }
+    },
+  });
+
+  const {
+    loading: getCommentsLoading,
+    data: getCommentsData,
+    error: getCommentsError,
+    refetch: getCommentsRefetch,
+  } = useQuery(GET_COMMENTS, {
+    fetchPolicy: "cache-and-network",
+    variables: {
+      input: searchFilter,
+    },
+    notifyOnNetworkStatusChange: true,
+    onCompleted(data: any) {
+      setComments(data?.getComments?.list);
+      setTotal(data?.getComments?.metaCounter?.[0]?.total || 0);
+    },
+  });
 
   /** LIFECYCLES **/
   useEffect(() => {
@@ -95,19 +149,111 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
     );
   };
 
-  const likeBoardArticleHandler = async (user: any, id: any) => {};
+  const likeBoardArticleHandler = async (user: any, id: any) => {
+    try {
+      if (likeLoading) return;
+      if (!id) return;
+      if (!user._id) throw new Error(Messages.error2);
+
+      setLikeLoading(true);
+
+      await likeTargetBoardArticle({
+        variables: {
+          input: id,
+        },
+      });
+
+      await boardArticleRefetch({ input: articleId });
+      await sweetTopSmallSuccessAlert("Success!", 800);
+    } catch (err: any) {
+      console.log("ERROR, likeBoardArticleHandler:", err.message);
+      sweetMixinErrorAlert(err.message).then();
+    } finally {
+      setLikeLoading(false);
+    }
+  };
 
   const creteCommentHandler = async () => {
     if (!comment) return;
+
+    try {
+      if (!user?._id) throw new Error(Messages.error2);
+
+      const commentInput: CommentInput = {
+        commentGroup: CommentGroup.ARTICLE,
+        commentRefId: articleId,
+        commentContent: comment,
+      };
+
+      await createComment({
+        variables: {
+          input: commentInput,
+        },
+      });
+
+      await getCommentsRefetch({ input: searchFilter });
+      await boardArticleRefetch({ input: articleId });
+      setComment("");
+      await sweetMixinSuccessAlert("Successfully commented!");
+    } catch (error: any) {
+      await sweetMixinErrorAlert(error.message);
+    }
   };
 
   const updateButtonHandler = async (
     commentId: string,
     commentStatus?: CommentStatus.DELETE,
-  ) => {};
+  ) => {
+    try {
+      if (!user?._id) throw new Error(Messages.error2);
+      if (!commentId) throw new Error("Select a comment to update");
+      if (
+        updatedComment ===
+        comments?.find((comment) => comment?._id === commentId)?.commentContent
+      )
+        return;
+
+      const updateData: CommentUpdate = {
+        _id: commentId,
+        ...(commentStatus && { commentStatus: commentStatus }),
+        ...(updatedComment && { commentContent: updatedComment }),
+      };
+
+      if (!updateData?.commentContent && !updateData?.commentStatus)
+        throw new Error("Provide data to update your comment!");
+
+      if (commentStatus) {
+        if (await sweetConfirmAlert("Do you want to delete the comment?")) {
+          await updateComment({
+            variables: {
+              input: updateData,
+            },
+          });
+
+          await sweetMixinSuccessAlert("Successfully deleted!");
+        } else return;
+      } else {
+        await updateComment({
+          variables: {
+            input: updateData,
+          },
+        });
+
+        await sweetMixinSuccessAlert("Successfully updated!");
+      }
+      await getCommentsRefetch({ input: searchFilter });
+    } catch (error: any) {
+      await sweetMixinErrorAlert(error.message);
+    } finally {
+      setOpenBackdrop(false);
+      setUpdatedComment("");
+      setUpdatedCommentWordsCnt(0);
+      setUpdatedCommentId("");
+    }
+  };
 
   const getCommentMemberImage = (imageUrl: string | undefined) => {
-    if (imageUrl) return `${process.env.NEXT_PUBLIC_API_URL}/${imageUrl}`;
+    if (imageUrl) return `${process.env.REACT_APP_API_URL}/${imageUrl}`;
     else return "/img/community/articleImg.png";
   };
 
@@ -131,7 +277,6 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
   const paginationHandler = (e: T, value: number) => {
     setSearchFilter({ ...searchFilter, page: value });
   };
-
   if (device === "mobile") {
     return <div>COMMUNITY DETAIL PAGE MOBILE</div>;
   } else {

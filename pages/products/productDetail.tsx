@@ -32,10 +32,11 @@ import { useMutation, useQuery } from "@apollo/client";
 import { GET_COMMENTS, GET_PRODUCT, GET_PRODUCTS } from "@/apollo/user/query";
 import { Product } from "@/libs/types/product/product";
 import { Direction } from "@/libs/enums/common.enum";
-import { NEXT_PUBLIC_API_URL } from "@/libs/config"; // ✅ import qo'shildi
+import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 import { userVar } from "@/apollo/store";
+import { ADD_TO_CART } from "@/apollo/user/cart/mutation";
+import { GET_MY_CART } from "@/apollo/user/cart/query";
 
-// ✅ defaultProps o'rniga to'g'ridan-to'g'ri initial value
 const initialComment: CommentsInquiry = {
   page: 1,
   limit: 5,
@@ -54,7 +55,6 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
 
-  // ✅ defaultProps o'rniga to'g'ridan-to'g'ri useState ga berildi
   const [commentInquiry, setCommentInquiry] =
     useState<CommentsInquiry>(initialComment);
 
@@ -70,6 +70,11 @@ const ProductDetail = () => {
   const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
   const [createComment] = useMutation(CREATE_COMMENT);
   const [updateComment] = useMutation(UPDATE_COMMENT);
+
+  const [addToCart, { loading: addToCartLoading }] = useMutation(ADD_TO_CART, {
+    refetchQueries: [{ query: GET_MY_CART }],
+    awaitRefetchQueries: true,
+  });
 
   useEffect(() => {
     const id = router.query.id as string | undefined;
@@ -90,11 +95,14 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchedProduct = productData?.getProduct;
     if (!fetchedProduct) return;
+
     setSelectedProduct(fetchedProduct);
+
     setCommentInquiry((prev) => ({
       ...prev,
       search: { ...(prev.search ?? {}), commentRefId: fetchedProduct._id },
     }));
+
     setInsertCommentData((prev) => ({
       ...prev,
       commentRefId: fetchedProduct._id,
@@ -157,11 +165,12 @@ const ProductDetail = () => {
         },
       });
 
-      await getProductsRefetch(); // ✅ shart olib tashlandi
+      await getProductsRefetch();
     } catch (error) {
       console.log("like product error:", error);
     }
   };
+
   const deleteCommentHandler = async (commentId: string) => {
     try {
       await updateComment({
@@ -172,11 +181,13 @@ const ProductDetail = () => {
           },
         },
       });
+
       await getCommentsRefetch({ input: commentInquiry });
     } catch (err: any) {
       console.log("delete comment error:", err);
     }
   };
+
   const handleSizeChange = (event: SelectChangeEvent) => {
     setSelectedSize(event.target.value);
   };
@@ -202,7 +213,7 @@ const ProductDetail = () => {
           input: insertCommentData,
         },
       });
-      console.log("COMMENT DATA:", insertCommentData);
+
       setInsertCommentData((prev) => ({
         ...prev,
         commentContent: "",
@@ -216,23 +227,35 @@ const ProductDetail = () => {
     }
   };
 
-  const addToCartHandler = () => {
+  const addToCartHandler = async () => {
+    if (!selectedProduct?._id) return;
+
     if (!selectedSize) {
       alert("Please select size");
       return;
     }
 
-    const payload = {
-      productId: selectedProduct?._id,
-      size: selectedSize,
-      color: selectedColor,
-      qty: 1,
-    };
+    try {
+      const variables = {
+        input: {
+          productId: selectedProduct._id,
+          quantity: 1,
+          size: [selectedSize],
+        },
+      };
 
-    console.log("ADD TO CART:", payload);
+      console.log("ADD TO CART VARIABLES:", variables);
 
-    setSelectedSize("");
-    setSelectedColor("");
+      const res = await addToCart({ variables });
+      console.log("ADD TO CART SUCCESS:", res);
+
+      setSelectedSize("");
+      setSelectedColor("");
+    } catch (err: any) {
+      console.error("ADD TO CART ERROR:", err);
+      console.error("GRAPHQL ERRORS:", err?.graphQLErrors);
+      console.error("FIRST ERROR:", err?.graphQLErrors?.[0]);
+    }
   };
 
   if (getProductLoading || !selectedProduct) {
@@ -248,7 +271,6 @@ const ProductDetail = () => {
               (image: string, index: number) => (
                 <img
                   key={index}
-                  // ✅ NEXT_PUBLIC_API_URL qo'shildi
                   src={`${NEXT_PUBLIC_API_URL}/${image}`}
                   alt={`${selectedProduct.productTitle}-${index}`}
                 />
@@ -354,8 +376,9 @@ const ProductDetail = () => {
             <Button
               variant="contained"
               className="cart-btn"
-              onClick={addToCartHandler}>
-              Add to cart
+              onClick={addToCartHandler}
+              disabled={addToCartLoading}>
+              {addToCartLoading ? "Adding..." : "Add to cart"}
             </Button>
 
             <Stack className="selected-info">

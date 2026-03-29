@@ -125,6 +125,10 @@ export default function SingleProductForm() {
       alert("Product price is required");
       return;
     }
+    if (!form.size) {
+      alert("Product price is required");
+      return;
+    }
     if (!form.imageFiles.length) {
       alert("At least one image is required");
       return;

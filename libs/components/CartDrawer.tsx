@@ -7,71 +7,122 @@ import {
   Typography,
   Divider,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { useQuery, useMutation } from "@apollo/client";
+import { UPDATE_CART, REMOVE_CART_ITEM } from "@/apollo/user/cart/mutation";
 import styles from "@/scss/pc/layout/CartDrawer.module.scss";
-
-interface CartItem {
-  _id: string;
-  productTitle: string;
-  productPrice: number;
-  productImage: string;
-  size: string;
-  quantity: number;
-}
+import { GET_MY_CART } from "@/apollo/user/cart/query";
+import { Cart, CartItem } from "../types/cart/cart";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-const mockItems: CartItem[] = [
-  {
-    _id: "1",
-    productTitle: "Ronin Unity",
-    productPrice: 40,
-    productImage: "/img/product/product1.jpg",
-    size: "128",
-    quantity: 1,
-  },
-  {
-    _id: "2",
-    productTitle: "Holley Pearled Ivory",
-    productPrice: 110,
-    productImage: "/img/product/product2.jpg",
-    size: "164",
-    quantity: 1,
-  },
-];
-
 export default function CartDrawer({ open, onClose }: Props) {
-  const [items, setItems] = useState<CartItem[]>(mockItems);
+  const { data, loading } = useQuery<{ getMyCart: Cart }>(GET_MY_CART, {
+    skip: !open,
+    fetchPolicy: "network-only",
+  });
 
-  const updateQuantity = (id: string, delta: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item._id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item,
-      ),
-    );
+  const [updateCartItem, { loading: updating }] = useMutation<{
+    updateCartItem: Cart;
+  }>(UPDATE_CART);
+
+  const [removeFromCart, { loading: removing }] = useMutation<{
+    removeFromCart: Cart;
+  }>(REMOVE_CART_ITEM);
+
+  const items: CartItem[] = data?.getMyCart?.items ?? [];
+  const totalAmount = Number(data?.getMyCart?.totalAmount ?? 0);
+
+  const getImageSrc = (item: CartItem) => {
+    const firstImage = item.productImages?.[0];
+    if (!firstImage) return "/img/product/default-product.png";
+
+    if (firstImage.startsWith("http")) return firstImage;
+
+    return `${process.env.NEXT_PUBLIC_API_URL}/${firstImage}`;
   };
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item._id !== id));
+  const getSizeLabel = (size: string | string[] | undefined) => {
+    if (!size) return "";
+    return Array.isArray(size) ? size.join(", ") : size;
   };
 
-  const subtotal = items.reduce(
-    (sum, i) => sum + i.productPrice * i.quantity,
-    0,
-  );
+  const updateQuantity = async (
+    id: string,
+    delta: number,
+    currentQty: number,
+  ) => {
+    const newQty = Math.max(1, Number(currentQty) + delta);
+    if (newQty === currentQty) return;
+
+    try {
+      console.log("UPDATE VARIABLES:", {
+        input: {
+          _id: String(id),
+          quantity: newQty,
+        },
+      });
+
+      const res = await updateCartItem({
+        variables: {
+          input: {
+            _id: String(id),
+            quantity: newQty,
+          },
+        },
+        refetchQueries: [{ query: GET_MY_CART }],
+        awaitRefetchQueries: true,
+      });
+
+      console.log("UPDATE RESULT:", res);
+    } catch (err: any) {
+      console.error("UPDATE CART ERROR:", err);
+      console.error("GRAPHQL ERRORS:", err?.graphQLErrors);
+      console.error("FIRST ERROR:", err?.graphQLErrors?.[0]);
+    }
+  };
+
+  const removeItem = async (id: string) => {
+    try {
+      await removeFromCart({
+        variables: {
+          input: { _id: id },
+        },
+        refetchQueries: [{ query: GET_MY_CART }],
+        awaitRefetchQueries: true,
+      });
+    } catch (err) {
+      console.error("REMOVE CART ITEM ERROR:", err);
+    }
+  };
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      ModalProps={{ keepMounted: true }}
+      sx={{
+        zIndex: 2000,
+        "& .MuiBackdrop-root": { backgroundColor: "rgba(0,0,0,0.35)" },
+        "& .MuiDrawer-paper": {
+          width: 520,
+          maxWidth: "100vw",
+          height: "calc(100% - 80px)",
+          top: "80px",
+          boxSizing: "border-box",
+          backgroundColor: "#fff",
+          boxShadow: "none",
+        },
+      }}>
       <Box className={styles.drawer}>
-        {/* Header */}
         <Stack
           className={styles.header}
           direction="row"
@@ -80,6 +131,7 @@ export default function CartDrawer({ open, onClose }: Props) {
           <Typography className={styles.title}>
             CART {String(items.length).padStart(2, "0")}
           </Typography>
+
           <IconButton onClick={onClose} size="small">
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -87,82 +139,114 @@ export default function CartDrawer({ open, onClose }: Props) {
 
         <Divider />
 
-        {/* Items */}
         <Box className={styles.itemList}>
-          {items.length === 0 ? (
+          {loading ? (
+            <Stack alignItems="center" mt={4}>
+              <CircularProgress size={24} />
+            </Stack>
+          ) : items.length === 0 ? (
             <Typography className={styles.empty}>Your cart is empty</Typography>
           ) : (
-            items.map((item) => (
-              <Box key={item._id} className={styles.item}>
-                <img
-                  src={item.productImage}
-                  alt={item.productTitle}
-                  className={styles.itemImg}
-                />
-                <Box className={styles.itemInfo}>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography className={styles.itemTitle}>
-                      {item.productTitle.toUpperCase()}
-                    </Typography>
-                    <Typography className={styles.itemPrice}>
-                      ${item.productPrice.toFixed(2)}
-                    </Typography>
-                  </Stack>
-                  <Typography className={styles.itemSize}>
-                    {item.size}
-                  </Typography>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}>
-                    <Stack direction="row" alignItems="center" gap={1}>
-                      <IconButton
-                        size="small"
-                        onClick={() => updateQuantity(item._id, -1)}>
-                        <RemoveIcon sx={{ fontSize: 14 }} />
-                      </IconButton>
-                      <Typography className={styles.qty}>
-                        {item.quantity}
+            items.map((item, index) => (
+              <Box key={item._id}>
+                <Box className={styles.item}>
+                  <img
+                    src={getImageSrc(item)}
+                    alt={item.productTitle || "Product image"}
+                    className={styles.itemImg}
+                    onError={(e) => {
+                      e.currentTarget.src = "/img/product/default-product.png";
+                    }}
+                  />
+
+                  <Box className={styles.itemInfo}>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      gap={2}>
+                      <Typography className={styles.itemTitle}>
+                        {(item.productTitle ?? "").toUpperCase()}
                       </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => updateQuantity(item._id, 1)}>
-                        <AddIcon sx={{ fontSize: 14 }} />
-                      </IconButton>
+
+                      <Typography className={styles.itemPrice}>
+                        ${Number(item.productPrice ?? 0).toFixed(2)}
+                      </Typography>
                     </Stack>
-                    <Typography
-                      className={styles.removeBtn}
-                      onClick={() => removeItem(item._id)}>
-                      REMOVE
+
+                    <Typography className={styles.itemSize}>
+                      {getSizeLabel(item.size)}
                     </Typography>
-                  </Stack>
+
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      mt={1}>
+                      <Stack direction="row" alignItems="center" gap={1}>
+                        <IconButton
+                          size="small"
+                          disabled={updating || removing || item.quantity <= 1}
+                          onClick={() =>
+                            updateQuantity(item._id, -1, item.quantity)
+                          }>
+                          <RemoveIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+
+                        <Typography className={styles.qty}>
+                          {item.quantity}
+                        </Typography>
+
+                        <IconButton
+                          size="small"
+                          disabled={updating || removing}
+                          onClick={() =>
+                            updateQuantity(item._id, 1, item.quantity)
+                          }>
+                          <AddIcon sx={{ fontSize: 14 }} />
+                        </IconButton>
+                      </Stack>
+
+                      <Typography
+                        className={styles.removeBtn}
+                        onClick={() => !removing && removeItem(item._id)}
+                        sx={{
+                          cursor: removing ? "not-allowed" : "pointer",
+                          opacity: removing ? 0.6 : 1,
+                        }}>
+                        REMOVE
+                      </Typography>
+                    </Stack>
+                  </Box>
                 </Box>
-                <Divider />
+
+                {index !== items.length - 1 && <Divider />}
               </Box>
             ))
           )}
         </Box>
 
-        {/* Footer */}
         <Box className={styles.footer}>
           <Stack direction="row" justifyContent="space-between" mb={1}>
             <Typography className={styles.label}>SUBTOTAL</Typography>
             <Typography className={styles.value}>
-              ${subtotal.toFixed(2)}
+              ${totalAmount.toFixed(2)}
             </Typography>
           </Stack>
+
           <Stack direction="row" justifyContent="space-between" mb={2}>
             <Typography className={styles.label}>SHIPPING</Typography>
             <Typography className={styles.value}>FREE</Typography>
           </Stack>
+
           <Divider sx={{ mb: 2 }} />
+
           <Stack direction="row" justifyContent="space-between" mb={3}>
             <Typography className={styles.grandLabel}>GRAND TOTAL</Typography>
             <Typography className={styles.grandValue}>
-              ${subtotal.toFixed(2)}
+              ${totalAmount.toFixed(2)}
             </Typography>
           </Stack>
+
           <Button fullWidth className={styles.checkoutBtn}>
             CONTINUE TO CHECKOUT
           </Button>

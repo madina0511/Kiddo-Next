@@ -11,24 +11,70 @@ import { BoardArticle } from "../../types/board-article/board-article";
 import { Messages } from "../../config";
 import CommunityCard from "../common/CommunityCard";
 import { T } from "@/libs/common";
+import {
+  sweetMixinErrorAlert,
+  sweetTopSmallSuccessAlert,
+} from "@/libs/types/sweetAlert";
+import { GET_BOARD_ARTICLES } from "@/apollo/user/query";
+import { LIKE_TARGET_BOARD_ARTICLE } from "@/apollo/user/mutation";
 
 const MyArticles = ({ initialInput, ...props }: T) => {
   const device = useDeviceDetect();
   const user = useReactiveVar(userVar);
   const [searchCommunity, setSearchCommunity] = useState({
-    ...initialInput,
-    search: { memberId: user._id },
+    page: 1,
+    limit: 6,
+    sort: "createdAt",
+    direction: "DESC",
+    search: { memberId: user?._id },
   });
   const [boardArticles, setBoardArticles] = useState<BoardArticle[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
 
   /** APOLLO REQUESTS **/
+  const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
+
+  const {
+    loading: boardArticlesLoading,
+    data: boardArticlesData,
+    error: getBoardArticlesError,
+    refetch: boardArticlesRefetch,
+  } = useQuery(GET_BOARD_ARTICLES, {
+    fetchPolicy: "network-only",
+    skip: !user?._id,
+    variables: {
+      input: searchCommunity,
+    },
+    notifyOnNetworkStatusChange: true,
+    onCompleted(data: T) {
+      setBoardArticles(data?.getBoardArticles?.list);
+      setTotalCount(data?.getBoardArticles?.metaCounter?.[0]?.total);
+    },
+  });
 
   /** HANDLERS **/
   const paginationHandler = (e: T, value: number) => {
     setSearchCommunity({ ...searchCommunity, page: value });
   };
-  const likeArticleHandler = async (e: any, user: any, id: string) => {};
+  const likeArticleHandler = async (e: any, user: any, id: string) => {
+    try {
+      e.stopPropagation();
+      if (!id) return;
+      if (!user?._id) throw new Error(Messages.error2);
+
+      await likeTargetBoardArticle({
+        variables: {
+          input: id,
+        },
+      });
+
+      await boardArticlesRefetch({ input: searchCommunity });
+      await sweetTopSmallSuccessAlert("Success!", 750);
+    } catch (err: any) {
+      console.log("ERROR, likeArticleHandler:", err.message);
+      sweetMixinErrorAlert(err.message).then();
+    }
+  };
 
   if (device === "mobile") {
     return <>ARTICLE PAGE MOBILE</>;

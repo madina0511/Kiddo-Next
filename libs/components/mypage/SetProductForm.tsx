@@ -186,6 +186,10 @@ export default function SetProductForm() {
         await sweetMixinErrorAlert("All item prices are required");
         return;
       }
+      if (!item.size) {
+        await sweetMixinErrorAlert("All item prices are required");
+        return;
+      }
       if (!item.imageFile) {
         await sweetMixinErrorAlert("All item images are required");
         return;

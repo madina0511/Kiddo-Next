@@ -16,7 +16,7 @@ import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 interface CommunityCardProps {
   boardArticle: BoardArticle;
   size?: string;
-  likeBoardArticleHandler?: any;
+  likeBoardArticleHandler?: (e: any, user: any, id: string) => void;
 }
 
 const CommunityCard = (props: CommunityCardProps) => {
@@ -35,7 +35,7 @@ const CommunityCard = (props: CommunityCardProps) => {
   ) => {
     router.push(
       {
-        pathname: "/community/detail",
+        pathname: "/kiddo-club/detail",
         query: {
           articleCategory: boardArticle?.articleCategory,
           id: boardArticle?._id,
@@ -87,7 +87,7 @@ const CommunityCard = (props: CommunityCardProps) => {
               color={"default"}
               onClick={(e: any) => {
                 e.stopPropagation();
-                likeBoardArticleHandler(user, boardArticle?._id);
+                likeBoardArticleHandler?.(e, user, boardArticle?._id);
               }}>
               {boardArticle?.meLiked && boardArticle?.meLiked[0]?.myFavorite ? (
                 <FavoriteIcon color={"primary"} />

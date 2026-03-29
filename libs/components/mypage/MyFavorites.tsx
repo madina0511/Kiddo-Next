@@ -8,6 +8,11 @@ import { Messages } from "../../config";
 import { Product } from "@/libs/types/product/product";
 import ProductCard from "../products/productCard";
 import { T } from "@/libs/common";
+import { sweetMixinErrorAlert } from "@/libs/types/sweetAlert";
+import { GET_FAVORITIES } from "@/apollo/user/query";
+import { useMutation, useQuery } from "@apollo/client";
+import { LIKE_TARGET_PRODUCT } from "@/apollo/user/mutation";
+import MyPageProductCard from "./MyPageProductCard";
 
 const MyFavorites: NextPage = () => {
   const device = useDeviceDetect();
@@ -15,18 +20,56 @@ const MyFavorites: NextPage = () => {
   const [total, setTotal] = useState<number>(0);
   const [searchFavorites, setSearchFavorites] = useState<T>({
     page: 1,
-    limit: 6,
+    limit: 4,
   });
+
+  /** APOLLO REQUESTS **/
+  const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
+
+  const {
+    loading: getFavoritesLoading,
+    data: getFavoritesData,
+    error: getFavoritesError,
+    refetch: getFavoritesRefetch,
+  } = useQuery(GET_FAVORITIES, {
+    fetchPolicy: "network-only",
+    variables: {
+      input: searchFavorites,
+    },
+    notifyOnNetworkStatusChange: true,
+    onCompleted(data: T) {
+      console.log("data+++", data.getFavorities);
+      setMyFavorites(data.getFavorities?.list);
+      setTotal(data.getFavorities?.metaCounter?.[0]?.total || 0);
+    },
+  });
+  console.log("getFavoritesLoading:", getFavoritesLoading);
 
   /** HANDLERS **/
   const paginationHandler = (e: T, value: number) => {
     setSearchFavorites({ ...searchFavorites, page: value });
   };
 
-  const likeProductHandler = async (id: string) => {};
+  const likeProductHandler = async (user: any, id: string) => {
+    try {
+      if (!id) return;
+      if (!user._id) throw new Error(Messages.error2);
+
+      await likeTargetProduct({
+        variables: {
+          input: id,
+        },
+      });
+
+      await getFavoritesRefetch({ input: searchFavorites });
+    } catch (err: any) {
+      console.log("ERROR, likePropertyHandler:", err.message);
+      sweetMixinErrorAlert(err.message).then();
+    }
+  };
 
   if (device === "mobile") {
-    return <div>NESTAR MY FAVORITES MOBILE</div>;
+    return <div>KIDDO MY FAVORITES MOBILE</div>;
   } else {
     return (
       <div id="my-favorites-page">
@@ -42,7 +85,7 @@ const MyFavorites: NextPage = () => {
           {myFavorites?.length ? (
             myFavorites?.map((product: Product) => {
               return (
-                <ProductCard
+                <MyPageProductCard
                   product={product}
                   myFavorites={true}
                   likeProductHandler={likeProductHandler}
@@ -57,8 +100,8 @@ const MyFavorites: NextPage = () => {
           )}
         </Stack>
         {myFavorites?.length ? (
-          <Stack className="pagination-config">
-            <Stack className="pagination-box">
+          <div className="pagination-config">
+            <div className="pagination-box">
               <Pagination
                 count={Math.ceil(total / searchFavorites.limit)}
                 page={searchFavorites.page}
@@ -66,13 +109,13 @@ const MyFavorites: NextPage = () => {
                 color="primary"
                 onChange={paginationHandler}
               />
-            </Stack>
-            <Stack className="total-result">
+            </div>
+            <div className="total-result">
               <Typography>
                 Total {total} favorite produc{total > 1 ? "ts" : "t"}
               </Typography>
-            </Stack>
-          </Stack>
+            </div>
+          </div>
         ) : null}
       </div>
     );

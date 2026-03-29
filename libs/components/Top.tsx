@@ -11,12 +11,13 @@ import Link from "next/link";
 import MegaMenuPopper from "./MegaMenuPopper";
 import BrandMenuPopper from "./brands/MegaMenuPopper";
 import { useRouter } from "next/router";
-import { useReactiveVar } from "@apollo/client";
+import { useQuery, useReactiveVar } from "@apollo/client";
 import { userVar } from "@/apollo/store";
 import { getJwtToken, logOut, updateUserInfo } from "../auth";
 import { NEXT_PUBLIC_API_URL } from "../config";
 import { sweetConfirmAlert } from "../types/sweetAlert";
 import CartDrawer from "./CartDrawer";
+import { GET_MY_CART } from "@/apollo/user/cart/query";
 
 const Top = () => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const Top = () => {
   const [cartOpen, setCartOpen] = useState(false);
 
   // Apollo
-
+  const { data: cartData } = useQuery(GET_MY_CART);
   // Effects
   useEffect(() => {
     const jwt = getJwtToken();
@@ -104,7 +105,7 @@ const Top = () => {
           <div className="cartWrap">
             <IconButton onClick={() => setCartOpen(true)}>
               <Badge
-                badgeContent={4}
+                badgeContent={cartData?.getMyCart?.items?.length || 0}
                 sx={{
                   "& .MuiBadge-badge": {
                     backgroundColor: "#6b7280",
