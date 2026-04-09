@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { Pagination, Stack, Typography } from "@mui/material";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
@@ -36,6 +36,7 @@ const MyProducts = ({ initialInput, ...props }: any) => {
 
   /** APOLLO REQUESTS **/
   const [updateProduct] = useMutation(UPDATE_PRODUCT);
+
   const {
     loading: getAgentProductsLoading,
     data: getAgentProductsData,
@@ -45,11 +46,14 @@ const MyProducts = ({ initialInput, ...props }: any) => {
     fetchPolicy: "network-only",
     variables: { input: searchFilter },
     ssr: false,
-    onCompleted: (data) => {
-      setAgentProducts(data.getAgentProducts.list);
-      setTotal(data.getAgentProducts.metaCounter[0]?.total ?? 0);
-    },
   });
+
+  useEffect(() => {
+    setAgentProducts(getAgentProductsData?.getAgentProducts?.list ?? []);
+    setTotal(
+      getAgentProductsData?.getAgentProducts?.metaCounter?.[0]?.total ?? 0,
+    );
+  }, [getAgentProductsData]);
 
   /** HANDLERS **/
   const paginationHandler = (e: T, value: number) => {

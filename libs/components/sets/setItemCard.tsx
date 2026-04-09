@@ -14,7 +14,7 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ClothingSize, CLOTHING_SIZE_LABELS } from "@/libs/enums/product.enum";
 import { ADD_TO_CART } from "@/apollo/user/cart/mutation";
 import { GET_MY_CART } from "@/apollo/user/cart/query";
@@ -30,11 +30,17 @@ export default function SetItemCard({ itemId }: Props) {
   const [quantity, setQuantity] = useState(1);
   const [item, setItem] = useState<Product | null>(null);
 
-  useQuery(GET_PRODUCT, {
-    variables: { input: itemId },
-    fetchPolicy: "network-only",
-    onCompleted: (data: T) => setItem(data?.getProduct),
-  });
+  const { data: getProductData, loading: getProductLoading } = useQuery(
+    GET_PRODUCT,
+    {
+      variables: { input: itemId },
+      fetchPolicy: "network-only",
+    },
+  );
+
+  useEffect(() => {
+    setItem(getProductData?.getProduct ?? null);
+  }, [getProductData]);
 
   const [addToCart, { loading }] = useMutation(ADD_TO_CART);
 

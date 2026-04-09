@@ -3,6 +3,7 @@ import {
   BoardArticleStatus,
 } from "../../enums/board-article.enum";
 import { Member } from "../member/member";
+
 import { MeLiked, TotalCounter } from "../product/product";
 
 export interface BoardArticle {

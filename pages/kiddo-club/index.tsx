@@ -68,15 +68,18 @@ const Community = ({ initialInput = defaultCommunityInput }: T) => {
       input: searchCommunity,
     },
     notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      setBoardArticles(data?.getBoardArticles?.list);
-      setTotalCount(data?.getBoardArticles?.metaCounter[0]?.total);
-    },
   });
+
+  useEffect(() => {
+    setBoardArticles(boardArticlesData?.getBoardArticles?.list ?? []);
+    setTotalCount(
+      boardArticlesData?.getBoardArticles?.metaCounter?.[0]?.total ?? 0,
+    );
+  }, [boardArticlesData]);
 
   /** LIFECYCLES **/
   useEffect(() => {
-    if (!query?.articleCategory)
+    if (!query?.articleCategory) {
       router.push(
         {
           pathname: router.pathname,
@@ -85,7 +88,8 @@ const Community = ({ initialInput = defaultCommunityInput }: T) => {
         router.pathname,
         { shallow: true },
       );
-  }, []);
+    }
+  }, [query?.articleCategory, router]);
 
   /** HANDLERS **/
   const tabChangeHandler = async (e: T, value: string) => {

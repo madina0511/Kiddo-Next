@@ -31,6 +31,7 @@ const SetsPage = () => {
 
   // Apollo
   const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
+
   const {
     loading: getProductsLoading,
     data: getProductsData,
@@ -39,19 +40,21 @@ const SetsPage = () => {
     fetchPolicy: "network-only",
     variables: { input: searchFilter },
     notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      setSets(data?.getProducts?.list);
-      console.log("set", sets);
-      setTotal(data?.getProducts?.metaCounter[0]?.total);
-    },
   });
+
+  useEffect(() => {
+    setSets(getProductsData?.getProducts?.list ?? []);
+    setTotal(getProductsData?.getProducts?.metaCounter?.[0]?.total ?? 0);
+  }, [getProductsData]);
 
   // Effects
   useEffect(() => {
-    //BACKEND REFETCH
-    // getProductsRefech({ input: searchFilter }).then();
     console.log("++++searchFilter", searchFilter);
   }, [searchFilter]);
+
+  useEffect(() => {
+    console.log("set", sets);
+  }, [sets]);
 
   // Handlers
   const likeProductHandler = async (e: React.MouseEvent, setId: string) => {

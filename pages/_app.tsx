@@ -9,6 +9,15 @@ import "../scss/app.scss";
 import "../scss/pc/main.scss";
 
 import { ApolloProvider } from "@apollo/client";
+import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+
+// Next.js sets this automatically, but we can check if it's NOT production
+const isDev = process.env.NODE_ENV !== "production";
+
+if (isDev) {
+  loadDevMessages();
+  loadErrorMessages();
+}
 
 export default function App({ Component, pageProps }: AppProps) {
   //@ts-ignore

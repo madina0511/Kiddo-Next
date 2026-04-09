@@ -104,14 +104,6 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
       input: articleId,
     },
     notifyOnNetworkStatusChange: true,
-    onCompleted(data: any) {
-      setBoardArticle(data?.getBoardArticle);
-      if (data?.getBoardArticle?.memberData?.memberImage) {
-        setMemberImage(
-          `${process.env.REACT_APP_API_URL}/${data?.getBoardArticle?.memberData?.memberImage}`,
-        );
-      }
-    },
   });
 
   const {
@@ -125,16 +117,35 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
       input: searchFilter,
     },
     notifyOnNetworkStatusChange: true,
-    onCompleted(data: any) {
-      setComments(data?.getComments?.list);
-      setTotal(data?.getComments?.metaCounter?.[0]?.total || 0);
-    },
   });
 
   /** LIFECYCLES **/
   useEffect(() => {
-    if (articleId)
-      setSearchFilter({ ...searchFilter, search: { commentRefId: articleId } });
+    setBoardArticle(boardArticleData?.getBoardArticle ?? null);
+
+    const memberImg =
+      boardArticleData?.getBoardArticle?.memberData?.memberImage;
+
+    setMemberImage(
+      memberImg ? `${process.env.REACT_APP_API_URL}/${memberImg}` : "",
+    );
+  }, [boardArticleData]);
+
+  useEffect(() => {
+    setComments(getCommentsData?.getComments?.list ?? []);
+    setTotal(getCommentsData?.getComments?.metaCounter?.[0]?.total ?? 0);
+  }, [getCommentsData]);
+
+  useEffect(() => {
+    if (!articleId) return;
+
+    setSearchFilter((prev: any) => ({
+      ...prev,
+      search: {
+        ...prev.search,
+        commentRefId: articleId,
+      },
+    }));
   }, [articleId]);
 
   /** HANDLERS **/

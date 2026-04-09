@@ -1,5 +1,4 @@
 import { T } from "@/libs/common";
-import LayoutHome from "@/libs/components/layout/LayoutHome";
 import Filter from "@/libs/components/products/Filter";
 import {
   Box,
@@ -12,8 +11,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import Link from "next/link";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import styles from "@/scss/pc/products/products.module.scss";
 import ProductCard from "@/libs/components/products/productCard";
@@ -23,36 +21,34 @@ import { useMutation, useQuery } from "@apollo/client";
 import { LIKE_TARGET_PRODUCT } from "@/apollo/user/mutation";
 import { GET_PRODUCTS } from "@/apollo/user/query";
 import { Product } from "@/libs/types/product/product";
-
 import { Message } from "@/libs/enums/common.enum";
 import {
   sweetMixinErrorAlert,
   sweetTopSmallSuccessAlert,
 } from "@/libs/types/sweetAlert";
 
+const defaultFilter = {
+  page: 1,
+  limit: 6,
+  sort: "createdAt",
+  direction: "DESC",
+  search: {},
+};
+
 const Products = ({ initialInput }: any) => {
   const router = useRouter();
-  const category = router.query.category;
-  const [products, setProducts] = useState<Product[]>([]);
+
   const [openFilter, setOpenFilter] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [filterSortName, setFilterSortName] = useState("New");
   const [searchFilter, setSearchFilter] = useState(
-    initialInput || {
-      page: 1,
-      limit: 6,
-      sort: "createdAt",
-      direction: "DESC",
-      search: {},
-    },
+    initialInput || defaultFilter,
   );
-
-  const [total, setTotal] = useState<number>(products.length);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedType, setSelectedType] = useState<string>("ALL");
-  // Apollo Requests
 
+  /** APOLLO REQUESTS **/
   const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
+
   const {
     loading: getProductsLoading,
     data: getProductsData,
@@ -61,58 +57,81 @@ const Products = ({ initialInput }: any) => {
     fetchPolicy: "network-only",
     variables: { input: searchFilter },
     notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      setProducts(data?.getProducts?.list);
-      setTotal(data?.getProducts?.metaCounter[0]?.total);
-    },
   });
-  // LifeCycles
+
+  const products: Product[] = getProductsData?.getProducts?.list ?? [];
+  const total: number =
+    getProductsData?.getProducts?.metaCounter?.[0]?.total ?? 0;
+
+  const totalPages = useMemo(() => {
+    const limit = searchFilter?.limit ?? 1;
+    return Math.ceil(total / limit);
+  }, [total, searchFilter?.limit]);
+
+  /** LIFECYCLES **/
   useEffect(() => {
+    if (!router.isReady) return;
+
     if (router.query.input) {
-      const inputObj = JSON.parse(router?.query?.input as string);
-      setSearchFilter(inputObj);
+      try {
+        const inputObj = JSON.parse(router.query.input as string);
+        setSearchFilter(inputObj);
+        setCurrentPage(inputObj?.page ?? 1);
+        setSelectedCategory(inputObj?.search?.categoryList?.[0] ?? "ALL");
+        setSelectedType(inputObj?.search?.productType?.[0] ?? "ALL");
+        return;
+      } catch (error) {
+        console.error("Invalid router query input:", error);
+      }
     }
-    setCurrentPage(searchFilter.page === undefined ? 1 : searchFilter.page);
-  }, [router.query.input]);
 
-  // Handlers
+    setCurrentPage(searchFilter?.page ?? 1);
+  }, [router.isReady, router.query.input]);
+
+  /** HANDLERS **/
   const likeProductHandler = async (user: T, productId: string) => {
-    console.log("Liked product:", productId);
     try {
-      console.log("user, Id:", user, productId);
       if (!productId) return;
-      if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
+      if (!user?._id) throw new Error(Message.NOT_AUTHENTICATED);
 
-      await likeTargetProduct({ variables: { input: productId } });
+      await likeTargetProduct({
+        variables: { input: productId },
+      });
 
-      await getProductsRefetch({ input: searchFilter });
+      await getProductsRefetch({
+        input: searchFilter,
+      });
 
       await sweetTopSmallSuccessAlert("success", 800);
     } catch (err: any) {
-      console.log("ERRoR, likePropertyHandler: ", err.message);
       sweetMixinErrorAlert(err.message).then();
     }
   };
-  const categoryClickHandler = async (category: string) => {
-    setSelectedCategory(category);
 
-    const updatedFilter = {
-      ...searchFilter,
-      search: {
-        ...searchFilter.search,
-        categoryList: category === "ALL" ? undefined : [category],
-      },
-      page: 1,
-    };
-
-    setSearchFilter(updatedFilter);
-    setCurrentPage(1);
-
+  const pushFilterToRouter = async (updatedFilter: any) => {
     await router.push(
       `/products?input=${encodeURIComponent(JSON.stringify(updatedFilter))}`,
       undefined,
       { scroll: false },
     );
+  };
+
+  const categoryClickHandler = async (category: string) => {
+    setSelectedCategory(category);
+
+    const updatedFilter = {
+      ...searchFilter,
+      page: 1,
+      search: {
+        ...searchFilter.search,
+        categoryList: category === "ALL" ? undefined : [category],
+      },
+    };
+
+    setSearchFilter(updatedFilter);
+    setCurrentPage(1);
+
+    await pushFilterToRouter(updatedFilter);
   };
 
   const typeClickHandler = async (type: string) => {
@@ -120,22 +139,19 @@ const Products = ({ initialInput }: any) => {
 
     const updatedFilter = {
       ...searchFilter,
+      page: 1,
       search: {
         ...searchFilter.search,
         productType: type === "ALL" ? undefined : [type],
       },
-      page: 1,
     };
 
     setSearchFilter(updatedFilter);
     setCurrentPage(1);
 
-    await router.push(
-      `/products?input=${encodeURIComponent(JSON.stringify(updatedFilter))}`,
-      undefined,
-      { scroll: false },
-    );
+    await pushFilterToRouter(updatedFilter);
   };
+
   const handleFilterApply = async ({
     sizes,
     genders,
@@ -147,38 +163,34 @@ const Products = ({ initialInput }: any) => {
   }) => {
     const updatedFilter = {
       ...searchFilter,
+      page: 1,
       search: {
         ...searchFilter.search,
         size: sizes.length ? sizes : undefined,
         genderList: genders.length ? genders : undefined,
         productColors: colors.length ? colors : undefined,
       },
-      page: 1,
     };
 
     setSearchFilter(updatedFilter);
     setCurrentPage(1);
 
-    await router.push(
-      `/products?input=${encodeURIComponent(JSON.stringify(updatedFilter))}`,
-      undefined,
-      { scroll: false },
-    );
+    await pushFilterToRouter(updatedFilter);
   };
 
   const handlePaginationChange = async (
-    event: ChangeEvent<unknown>,
+    _event: ChangeEvent<unknown>,
     value: number,
   ) => {
-    const updatedFilter = { ...searchFilter, page: value };
+    const updatedFilter = {
+      ...searchFilter,
+      page: value,
+    };
+
     setSearchFilter(updatedFilter);
     setCurrentPage(value);
 
-    await router.push(
-      `/products?input=${encodeURIComponent(JSON.stringify(updatedFilter))}`,
-      undefined,
-      { scroll: false },
-    );
+    await pushFilterToRouter(updatedFilter);
   };
 
   return (
@@ -232,6 +244,7 @@ const Products = ({ initialInput }: any) => {
               <Typography className={styles.productCount}>
                 ({products.length} products)
               </Typography>
+
               <Button
                 className={styles.filterBtn}
                 onClick={() => setOpenFilter(true)}>
@@ -241,7 +254,11 @@ const Products = ({ initialInput }: any) => {
           </Box>
 
           <Box className={styles.productCards}>
-            {products.length === 0 ? (
+            {getProductsLoading ? (
+              <div className={styles.noData}>
+                <p>Loading...</p>
+              </div>
+            ) : products.length === 0 ? (
               <div className={styles.noData}>
                 <p>No products found!</p>
               </div>
@@ -267,7 +284,7 @@ const Products = ({ initialInput }: any) => {
               <Stack className={styles.paginationBox}>
                 <Pagination
                   page={currentPage}
-                  count={Math.ceil(total / searchFilter.limit)}
+                  count={totalPages}
                   onChange={handlePaginationChange}
                   shape="circular"
                   color="primary"
