@@ -75,6 +75,8 @@ export interface AgentProductsInquiry {
 // ADMIN
 export interface ALPISearch {
   productStatus?: ProductStatus;
+  productType?: ProductType;
+
   genderList?: Gender[];
 }
 export interface AllProductsInquiry {

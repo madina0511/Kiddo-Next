@@ -13,7 +13,7 @@
 @use "../pc/mypage/myProducts.scss";
 @use "../pc/mypage/mySaved.scss";
 @use "../pc/mypage/myOrders.scss";
-
+@use "../pc/admin/admin.scss";
 @use "../pc/kiddo-club/club_detail.scss";
 @use "../pc/kiddo-club/community.scss";
 @use "../pc/kiddo-club/write.scss";
@@ -62,7 +62,7 @@
             }
             span {
               color: #bebdbd;
-              font-family: $font;
+              font-family: inherit;
               font-size: 14px;
               font-style: normal;
               font-weight: 400;
@@ -70,7 +70,7 @@
             }
             p {
               color: #fff;
-              font-family: $font;
+              font-family: inherit;
               font-size: 15px;
               font-style: normal;
               font-weight: 600;
@@ -96,7 +96,7 @@
             flex-direction: column;
             strong {
               color: #fff;
-              font-family: $font;
+              font-family: inherit;
               font-size: 15px;
               font-style: normal;
               font-weight: 600;
@@ -120,7 +120,7 @@
                 border: none;
                 outline: none;
                 color: #fff;
-                font-family: $font;
+                font-family: inherit;
                 font-size: 14px;
                 font-style: normal;
                 font-weight: 400;
@@ -129,7 +129,7 @@
               }
               span {
                 color: #fff;
-                font-family: $font;
+                font-family: inherit;
                 font-size: 15px;
                 font-style: normal;
                 font-weight: 600;
@@ -149,7 +149,7 @@
               strong {
                 margin-bottom: 3px;
                 color: #fff;
-                font-family: $font;
+                font-family: inherit;
                 font-size: 15px;
                 font-style: normal;
                 font-weight: 600;
@@ -159,7 +159,7 @@
               span {
                 margin-top: 25px;
                 color: #bebdbd;
-                font-family: $font;
+                font-family: inherit;
                 font-size: 14px;
                 font-style: normal;
                 font-weight: 400;
@@ -183,7 +183,7 @@
         align-items: flex-end;
         span {
           color: #bebdbd;
-          font-family: $font;
+          font-family: inherit;
           font-size: 14px;
           font-style: normal;
           font-weight: 400;
