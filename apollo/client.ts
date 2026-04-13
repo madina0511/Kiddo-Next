@@ -93,7 +93,7 @@ function createIsomorphicLink() {
   }
 
   const wsLink = new WebSocketLink({
-    uri: process.env.NEXT_APP_API_WS ?? "ws://127.0.0.1:3007",
+    uri: process.env.NEXT_PUBLIC_API_WS ?? "ws://127.0.0.1:3007",
     options: {
       reconnect: true,
       timeout: 30000,
