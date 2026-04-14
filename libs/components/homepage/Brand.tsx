@@ -22,7 +22,7 @@ const Brand = () => {
       await sweetErrorAlert("Please enter your email");
       return;
     }
-    await sweetMixinSuccessAlert("Your email has been submitted successfully!");
+    await sweetMixinSuccessAlert("Thank you! We will contact you soon.");
     setEmail("");
   };
 

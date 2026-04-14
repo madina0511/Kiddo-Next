@@ -29,7 +29,8 @@ import {
   sweetTopSmallSuccessAlert,
 } from "@/libs/types/sweetAlert";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config";
-import { Direction } from "@/libs/enums/common.enum";
+import { Direction, Message } from "@/libs/enums/common.enum";
+import { T } from "@/libs/common";
 
 const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
   const device = useDeviceDetect();
@@ -126,12 +127,22 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
   }, [commentsData]);
 
   // HANDLERS
-  const likeProductHandler = async (user: any, id: string) => {
+  const likeProductHandler = async (user: T, productId: string) => {
     try {
-      await likeTargetProduct({ variables: { input: id } });
-      await getProductsRefetch();
-    } catch (error) {
-      console.log("like product error:", error);
+      if (!productId) return;
+      if (!user?._id) throw new Error(Message.NOT_AUTHENTICATED);
+
+      await likeTargetProduct({
+        variables: { input: productId },
+      });
+
+      await getProductsRefetch({
+        input: searchFilter,
+      });
+
+      await sweetTopSmallSuccessAlert("success", 800);
+    } catch (err: any) {
+      sweetMixinErrorAlert(err.message).then();
     }
   };
 

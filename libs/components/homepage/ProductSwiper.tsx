@@ -44,7 +44,7 @@ const ProductSwiper = () => {
         spaceBetween={16}
         slidesPerView={4}
         navigation
-        loop
+        loop={sets.length >= 8}
         speed={4000}
         autoplay={{
           delay: 0,

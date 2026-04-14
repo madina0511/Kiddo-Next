@@ -3,7 +3,7 @@ import React from "react";
 import { Stack, Typography } from "@mui/material";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { Comment } from "../../types/comment/comment";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import Moment from "react-moment";
 import { useRouter } from "next/router";
 
@@ -60,7 +60,7 @@ const Review = (props: ReviewProps) => {
           <Typography className={"description"}>
             {comment.commentContent}
           </Typography>
-          {user?._id === comment.memberId && (
+          {(user?._id === comment.memberId || user?.memberType === "ADMIN") && (
             <Typography
               onClick={() => props.deleteCommentHandler(comment._id)}
               sx={{
@@ -69,7 +69,7 @@ const Review = (props: ReviewProps) => {
                 color: "#999",
                 mt: 1,
               }}>
-              Delete
+              <DeleteIcon sx={{ fontSize: 18 }} />
             </Typography>
           )}
         </Stack>
