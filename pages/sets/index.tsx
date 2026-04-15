@@ -80,7 +80,7 @@ const SetsPage = () => {
               : "/img/banner/joinbaby.webp";
             console.log(
               "SERVER:",
-              process.env.NEXT_PUBLIC_SERVER_URL,
+              process.env.NEXT_PUBLIC_API_URL,
               "IMAGE:",
               set.productImages?.[0],
             );
