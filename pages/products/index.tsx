@@ -88,9 +88,7 @@ const Products = ({ initialInput }: any) => {
     setCurrentPage(searchFilter?.page ?? 1);
   }, [router.isReady, router.query.input]);
   useEffect(() => {
-    if (getProductsData?.getProducts?.list ?? []) {
-      setProductList(getProductsData.getProducts.list);
-    }
+    setProductList(getProductsData?.getProducts?.list ?? []);
   }, [getProductsData]);
   /** HANDLERS **/
   const likeProductHandler = async (user: T, productId: string) => {

@@ -88,20 +88,6 @@ const SetDetailPage = () => {
           </Box>
         </Box>
       </Box>
-      <Box className="see-more-wrap">
-        <Typography className="see-more-title">YOU MAY ALSO LIKE</Typography>
-        <Typography className="see-more-brand">{set.brandName}</Typography>
-
-        <Box className="see-more-card">
-          {relatedProducts.map((item: Product) => (
-            <ProductCard
-              key={item._id}
-              product={item}
-              likeProductHandler={likeProductHandler}
-            />
-          ))}
-        </Box>
-      </Box>
     </Box>
   );
 };
