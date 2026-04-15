@@ -91,7 +91,11 @@ const Top = () => {
           <BrandMenuPopper label="Brands" />
           <Link href="/kiddo-club">Kiddo Club</Link>
           <Link href="/sizeGuide">SizeGuide</Link>
-          {user._id ? <Link href={"/mypage"}>My Page</Link> : null}
+          {user._id ? (
+            <Link href={user.memberType === "ADMIN" ? "/_admin" : "/mypage"}>
+              My Page
+            </Link>
+          ) : null}
 
           <div className="searchBox">
             <input

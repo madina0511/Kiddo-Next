@@ -208,10 +208,7 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
             }
             alt=""
           />
-          <Box
-            component={"div"}
-            className={"info"}
-            onClick={() => redirectToMemberPageHandler(agent?._id as string)}>
+          <Box component={"div"} className={"info"}>
             <strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
           </Box>
         </Stack>

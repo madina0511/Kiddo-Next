@@ -27,7 +27,7 @@ const SetsPage = () => {
     direction: "DESC",
     search: { productType: [ProductType.SET] },
   });
-  const totalPages = Math.ceil(total / page);
+  const totalPages = Math.ceil(total / searchFilter.limit);
 
   // Apollo
   const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);

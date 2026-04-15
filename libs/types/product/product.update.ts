@@ -12,7 +12,7 @@ export interface ProductUpdate {
   productCategory?: ProductCategory;
   productTitle?: string;
   productColors?: ProductColor[];
-  brandName: string;
+  brandName?: string;
   productPrice?: number;
   productDiscount?: number;
   productImages?: string[];
