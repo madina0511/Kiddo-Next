@@ -153,7 +153,7 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
   const tabChangeHandler = (event: React.SyntheticEvent, value: string) => {
     router.replace(
       {
-        pathname: "/community",
+        pathname: "/kiddo-club",
         query: { articleCategory: value },
       },
       "/community",

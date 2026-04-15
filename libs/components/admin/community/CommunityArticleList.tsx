@@ -157,7 +157,7 @@ const CommunityArticleList = (props: CommunityArticleListProps) => {
 											{article.articleTitle}
 											{article.articleStatus === BoardArticleStatus.ACTIVE && (
 												<Link
-													href={`/community/detail?articleCategory=${article.articleCategory}&id=${article._id}`}
+													href={`/kiddo-club/detail?articleCategory=${article.articleCategory}&id=${article._id}`}
 													className="img-box"
 												>
 													<IconButton className="btn window">
