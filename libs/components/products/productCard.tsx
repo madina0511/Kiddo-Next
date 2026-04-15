@@ -4,7 +4,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import styles from "@/scss/pc/products/productCard.module.scss";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { userVar } from "@/apollo/store";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config";
@@ -21,10 +21,13 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
   const router = useRouter();
   const user = useReactiveVar(userVar);
 
-  // ✅ meLiked to'g'ri o'qilmoqda + local state bilan optimistic update
   const [isLiked, setIsLiked] = useState<boolean>(
     product?.meLiked?.[0]?.myFavorite ?? false,
   );
+
+  useEffect(() => {
+    setIsLiked(product?.meLiked?.[0]?.myFavorite ?? false);
+  }, [product?.meLiked?.[0]?.myFavorite]);
 
   const pushDetailHandler = async (productId: string) => {
     await router.push({

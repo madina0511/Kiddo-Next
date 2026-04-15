@@ -2,6 +2,7 @@ import React from "react";
 import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { Stack, Box, Typography } from "@mui/material";
 import { Comment } from "../../types/comment/comment";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Moment from "react-moment";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 import { useReactiveVar } from "@apollo/client";
@@ -39,11 +40,11 @@ const ReviewCard = (props: ReviewCardProps) => {
           </div>
         </div>
         <p>{comment.commentContent}</p>
-        {user?._id === comment.memberId && (
+        {(user?._id === comment.memberId || user?.memberType === "ADMIN") && (
           <Typography
             onClick={() => deleteCommentHandler?.(comment._id)}
             sx={{ cursor: "pointer", fontSize: "12px", color: "#999", mt: 1 }}>
-            Delete
+            <DeleteIcon sx={{ fontSize: 18 }} />
           </Typography>
         )}
         {fromMyPage && (

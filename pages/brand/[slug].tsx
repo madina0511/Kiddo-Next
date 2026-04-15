@@ -137,7 +137,7 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
       });
 
       await getProductsRefetch({
-        input: searchFilter,
+        input: { ...searchFilter, search: { memberId: agent?._id } },
       });
 
       await sweetTopSmallSuccessAlert("success", 800);
@@ -210,6 +210,7 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
           />
           <Box component={"div"} className={"info"}>
             <strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
+            <strong>{agent?.memberPhone}</strong>
           </Box>
         </Stack>
 

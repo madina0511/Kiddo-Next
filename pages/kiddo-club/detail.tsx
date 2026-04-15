@@ -44,7 +44,8 @@ import {
 } from "@/libs/types/sweetAlert";
 import { T } from "@/libs/common";
 import withLayoutBase from "@/libs/components/layout/LayoutBase";
-import { GET_COMMENTS } from "@/apollo/admin/query";
+import { GET_COMMENTS } from "@/apollo/user/query";
+
 import { GET_BOARD_ARTICLE } from "@/apollo/user/query";
 import {
   CREATE_COMMENT,
@@ -127,7 +128,7 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
       boardArticleData?.getBoardArticle?.memberData?.memberImage;
 
     setMemberImage(
-      memberImg ? `${process.env.REACT_APP_API_URL}/${memberImg}` : "",
+      memberImg ? `${process.env.NEXT_PUBLIC_API_URL}/${memberImg}` : "",
     );
   }, [boardArticleData]);
 
