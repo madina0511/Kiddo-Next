@@ -45,6 +45,7 @@ const Products = ({ initialInput }: any) => {
   );
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedType, setSelectedType] = useState<string>("ALL");
+  const [productList, setProductList] = useState<Product[]>([]);
 
   /** APOLLO REQUESTS **/
   const [likeTargetProduct] = useMutation(LIKE_TARGET_PRODUCT);
@@ -59,7 +60,6 @@ const Products = ({ initialInput }: any) => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const products: Product[] = getProductsData?.getProducts?.list ?? [];
   const total: number =
     getProductsData?.getProducts?.metaCounter?.[0]?.total ?? 0;
 
@@ -87,7 +87,11 @@ const Products = ({ initialInput }: any) => {
 
     setCurrentPage(searchFilter?.page ?? 1);
   }, [router.isReady, router.query.input]);
-
+  useEffect(() => {
+    if (getProductsData?.getProducts?.list ?? []) {
+      setProductList(getProductsData.getProducts.list);
+    }
+  }, [getProductsData]);
   /** HANDLERS **/
   const likeProductHandler = async (user: T, productId: string) => {
     try {
@@ -98,9 +102,29 @@ const Products = ({ initialInput }: any) => {
         variables: { input: productId },
       });
 
-      await getProductsRefetch({
-        input: searchFilter,
-      });
+      setProductList((prev: Product[]) =>
+        prev.map((product: Product) => {
+          if (product._id !== productId) return product;
+
+          const likedItem = product.meLiked?.[0];
+          const alreadyLiked = likedItem?.myFavorite ?? false;
+
+          return {
+            ...product,
+            productLikes: alreadyLiked
+              ? Math.max((product.productLikes ?? 1) - 1, 0)
+              : (product.productLikes ?? 0) + 1,
+            meLiked: likedItem
+              ? [
+                  {
+                    ...likedItem,
+                    myFavorite: !alreadyLiked,
+                  },
+                ]
+              : [],
+          };
+        }),
+      );
 
       await sweetTopSmallSuccessAlert("success", 800);
     } catch (err: any) {
@@ -242,7 +266,7 @@ const Products = ({ initialInput }: any) => {
 
             <Box className={styles.filterWrap}>
               <Typography className={styles.productCount}>
-                ({products.length} products)
+                ({productList.length} products)
               </Typography>
 
               <Button
@@ -258,12 +282,12 @@ const Products = ({ initialInput }: any) => {
               <div className={styles.noData}>
                 <p>Loading...</p>
               </div>
-            ) : products.length === 0 ? (
+            ) : productList.length === 0 ? (
               <div className={styles.noData}>
                 <p>No products found!</p>
               </div>
             ) : (
-              products.map((product) => (
+              productList.map((product) => (
                 <ProductCard
                   key={product._id}
                   product={product}
@@ -280,7 +304,7 @@ const Products = ({ initialInput }: any) => {
           />
 
           <Stack className={styles.paginationConfig}>
-            {products.length !== 0 && (
+            {productList.length !== 0 && (
               <Stack className={styles.paginationBox}>
                 <Pagination
                   page={currentPage}
@@ -292,7 +316,7 @@ const Products = ({ initialInput }: any) => {
               </Stack>
             )}
 
-            {products.length !== 0 && (
+            {productList.length !== 0 && (
               <Stack className={styles.totalResult}>
                 <Typography>
                   Total {total} product{total > 1 ? "s" : ""} available

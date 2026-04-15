@@ -27,7 +27,9 @@ const Top = () => {
   const [cartOpen, setCartOpen] = useState(false);
   console.log(userVar());
   // Apollo
-  const { data: cartData } = useQuery(GET_MY_CART);
+  const { data: cartData } = useQuery(GET_MY_CART, {
+    skip: !user?._id,
+  });
   useEffect(() => {
     const jwt = getJwtToken();
     if (jwt) updateUserInfo(jwt);

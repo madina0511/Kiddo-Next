@@ -21,13 +21,7 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
   const router = useRouter();
   const user = useReactiveVar(userVar);
 
-  const [isLiked, setIsLiked] = useState<boolean>(
-    product?.meLiked?.[0]?.myFavorite ?? false,
-  );
-
-  useEffect(() => {
-    setIsLiked(product?.meLiked?.[0]?.myFavorite ?? false);
-  }, [product?.meLiked?.[0]?.myFavorite]);
+  const isLiked = product?.meLiked?.[0]?.myFavorite ?? false;
 
   const pushDetailHandler = async (productId: string) => {
     await router.push({
@@ -44,9 +38,8 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
     ? `${NEXT_PUBLIC_API_URL}/${product.productImages[1]}`
     : mainImage;
 
-  const handleLike = () => {
-    // ✅ Optimistic update — server javobini kutmay UI yangilanadi
-    setIsLiked((prev) => !prev);
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
     likeProductHandler?.(user, product._id);
   };
 

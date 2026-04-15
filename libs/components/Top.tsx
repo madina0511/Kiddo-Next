@@ -31,26 +31,27 @@ const Top = () => {
   const [cartOpen, setCartOpen] = useState(false);
 
   // Apollo
-  const { data: cartData } = useQuery(GET_MY_CART);
+  const { data: cartData } = useQuery(GET_MY_CART, {
+    skip: !user?._id,
+  });
   // Effects
   useEffect(() => {
     const jwt = getJwtToken();
     if (jwt) updateUserInfo(jwt);
+  }, []);
 
+  useEffect(() => {
     const handleScroll = () => {
       const isHomePage = router.pathname === "/";
-      console.log("pathname:", router.pathname);
-      console.log("isHomePage:", isHomePage);
+
       if (isHomePage) {
         console.log("scrollY:", window.scrollY);
         const heroHeight = window.innerHeight;
         setScrolled(window.scrollY > heroHeight - 80);
       } else {
-        setScrolled(true); // ← boshqa sahifalarda har doim oq
+        setScrolled(true);
       }
     };
-
-    // ← sahifa load bo'lganda ham tekshir
     handleScroll();
 
     window.addEventListener("scroll", handleScroll);
