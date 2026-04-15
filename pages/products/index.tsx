@@ -119,7 +119,13 @@ const Products = ({ initialInput }: any) => {
                     myFavorite: !alreadyLiked,
                   },
                 ]
-              : [],
+              : [
+                  {
+                    memberId: user._id,
+                    likeRefId: productId,
+                    myFavorite: true,
+                  },
+                ],
           };
         }),
       );

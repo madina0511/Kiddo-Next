@@ -289,6 +289,15 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
   const paginationHandler = (e: T, value: number) => {
     setSearchFilter({ ...searchFilter, page: value });
   };
+  const normalizedContent = boardArticle?.articleContent
+    ?.replace(
+      /src="uploads\//g,
+      `src="${process.env.NEXT_PUBLIC_API_URL}/uploads/`,
+    )
+    ?.replace(
+      /\]\(uploads\//g,
+      `](${process.env.NEXT_PUBLIC_API_URL}/uploads/`,
+    );
   if (device === "mobile") {
     return <div>COMMUNITY DETAIL PAGE MOBILE</div>;
   } else {
@@ -298,7 +307,7 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
           <Stack className="main-box">
             <Stack className="left-config">
               <Stack className={"image-info"}>
-                <img src={"/img/logo/kiddo_logo.svg"} />
+                <img src={"/img/logo/k_logo.svg"} />
                 <Stack className={"community-name"}>
                   <Typography className={"name"}>
                     Community Board Article
@@ -440,7 +449,7 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
                   </Stack>
                   <Stack>
                     <ToastViewerComponent
-                      markdown={boardArticle?.articleContent}
+                      markdown={normalizedContent}
                       className={"ytb_play"}
                     />
                   </Stack>
