@@ -435,7 +435,10 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
                             <DeleteForeverIcon />
                           </IconButton>
                         )}
-                        <Stack className="divider"></Stack>
+                      </Stack>
+
+                      <Stack className="divider"></Stack>
+                      <Stack className="icon-info">
                         {boardArticle?.meLiked &&
                         boardArticle?.meLiked[0]?.myFavorite ? (
                           <ThumbUpAltIcon
