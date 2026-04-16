@@ -136,9 +136,35 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
         variables: { input: productId },
       });
 
-      await getProductsRefetch({
-        input: { ...searchFilter, search: { memberId: agent?._id } },
-      });
+      setAgentProducts((prev: Product[]) =>
+        prev.map((product: Product) => {
+          if (product._id !== productId) return product;
+
+          const likedItem = product.meLiked?.[0];
+          const alreadyLiked = likedItem?.myFavorite ?? false;
+
+          return {
+            ...product,
+            productLikes: alreadyLiked
+              ? Math.max((product.productLikes ?? 1) - 1, 0)
+              : (product.productLikes ?? 0) + 1,
+            meLiked: likedItem
+              ? [
+                  {
+                    ...likedItem,
+                    myFavorite: !alreadyLiked,
+                  },
+                ]
+              : [
+                  {
+                    memberId: user._id,
+                    likeRefId: productId,
+                    myFavorite: true,
+                  },
+                ],
+          };
+        }),
+      );
 
       await sweetTopSmallSuccessAlert("success", 800);
     } catch (err: any) {
@@ -210,7 +236,7 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
           />
           <Box component={"div"} className={"info"}>
             <strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
-            <strong>{agent?.memberPhone}</strong>
+            <span>{agent?.memberPhone}</span>
           </Box>
         </Stack>
 

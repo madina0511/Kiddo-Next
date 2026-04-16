@@ -50,8 +50,10 @@ import { GET_BOARD_ARTICLE } from "@/apollo/user/query";
 import {
   CREATE_COMMENT,
   LIKE_TARGET_BOARD_ARTICLE,
+  UPDATE_BOARD_ARTICLE,
   UPDATE_COMMENT,
 } from "@/apollo/user/mutation";
+import { Direction } from "@/libs/enums/common.enum";
 
 const ToastViewerComponent = dynamic(
   () => import("../../libs/components/community/TViewer"),
@@ -74,7 +76,11 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [searchFilter, setSearchFilter] = useState<CommentsInquiry>({
-    ...initialInput,
+    page: 1,
+    limit: 5,
+    sort: "createdAt",
+    direction: Direction.DESC,
+    search: { commentRefId: "" },
   });
   const [memberImage, setMemberImage] = useState<string>(
     "/img/community/articleImg.png",
@@ -91,6 +97,7 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
   /** APOLLO REQUESTS **/
   /** APOLLO REQUESTS **/
   const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
+  const [updateBoardArticle] = useMutation(UPDATE_BOARD_ARTICLE);
   const [createComment] = useMutation(CREATE_COMMENT);
   const [updateComment] = useMutation(UPDATE_COMMENT);
 
@@ -211,7 +218,18 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
       await sweetMixinErrorAlert(error.message);
     }
   };
-
+  const deleteArticleHandler = async (articleId: string) => {
+    try {
+      if (await sweetConfirmAlert("Do you want to delete this article?")) {
+        await updateBoardArticle({
+          variables: { input: { _id: articleId, articleStatus: "DELETE" } },
+        });
+        router.push("/kiddo-club");
+      }
+    } catch (err: any) {
+      sweetMixinErrorAlert(err.message);
+    }
+  };
   const updateButtonHandler = async (
     commentId: string,
     commentStatus?: CommentStatus.DELETE,
@@ -409,6 +427,15 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
                     </Stack>
                     <Stack className="info">
                       <Stack className="icon-info">
+                        {boardArticle?.memberId === user?._id && (
+                          <IconButton
+                            onClick={() =>
+                              deleteArticleHandler(boardArticle._id)
+                            }>
+                            <DeleteForeverIcon />
+                          </IconButton>
+                        )}
+                        <Stack className="divider"></Stack>
                         {boardArticle?.meLiked &&
                         boardArticle?.meLiked[0]?.myFavorite ? (
                           <ThumbUpAltIcon
@@ -676,15 +703,6 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
       </div>
     );
   }
-};
-CommunityDetail.defaultProps = {
-  initialInput: {
-    page: 1,
-    limit: 5,
-    sort: "createdAt",
-    direction: "DESC",
-    search: { commentRefId: "" },
-  },
 };
 
 export default withLayoutBase(CommunityDetail);
