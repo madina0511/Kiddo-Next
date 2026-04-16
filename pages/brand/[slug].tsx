@@ -42,7 +42,7 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
   const [agent, setAgent] = useState<Member | null>(null);
   const [searchFilter, setSearchFilter] = useState<ProductsInquiry>({
     page: 1,
-    limit: 9,
+    limit: 8,
     sort: "createdAt",
     direction: Direction.DESC,
     search: { memberId: "" },

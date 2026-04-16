@@ -20,7 +20,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
   const router = useRouter();
   const user = useReactiveVar(userVar);
-
+  const [isLiking, setIsLiking] = useState(false);
   const [isLiked, setIsLiked] = useState(
     product?.meLiked?.[0]?.myFavorite ?? false,
   );
@@ -46,8 +46,11 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isLiking) return;
+    setIsLiking(true);
     setIsLiked((prev) => !prev);
     likeProductHandler?.(user, product._id);
+    setIsLiking(false);
   };
 
   return (
