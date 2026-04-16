@@ -140,28 +140,20 @@ const BrandPage = ({ initialInput, initialComment, ...props }: any) => {
         prev.map((product: Product) => {
           if (product._id !== productId) return product;
 
-          const likedItem = product.meLiked?.[0];
-          const alreadyLiked = likedItem?.myFavorite ?? false;
+          const alreadyLiked = product.meLiked?.[0]?.myFavorite ?? false;
 
           return {
             ...product,
             productLikes: alreadyLiked
               ? Math.max((product.productLikes ?? 1) - 1, 0)
               : (product.productLikes ?? 0) + 1,
-            meLiked: likedItem
-              ? [
-                  {
-                    ...likedItem,
-                    myFavorite: !alreadyLiked,
-                  },
-                ]
-              : [
-                  {
-                    memberId: user._id,
-                    likeRefId: productId,
-                    myFavorite: true,
-                  },
-                ],
+            meLiked: [
+              {
+                memberId: user._id,
+                likeRefId: productId,
+                myFavorite: !alreadyLiked,
+              },
+            ],
           };
         }),
       );

@@ -21,7 +21,13 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
   const router = useRouter();
   const user = useReactiveVar(userVar);
 
-  const isLiked = product?.meLiked?.[0]?.myFavorite ?? false;
+  const [isLiked, setIsLiked] = useState(
+    product?.meLiked?.[0]?.myFavorite ?? false,
+  );
+
+  useEffect(() => {
+    setIsLiked(product?.meLiked?.[0]?.myFavorite ?? false);
+  }, [product?.meLiked]);
 
   const pushDetailHandler = async (productId: string) => {
     await router.push({
@@ -40,6 +46,7 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setIsLiked((prev) => !prev);
     likeProductHandler?.(user, product._id);
   };
 
