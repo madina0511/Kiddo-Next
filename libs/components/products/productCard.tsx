@@ -25,10 +25,6 @@ const ProductCard = ({ product, likeProductHandler }: ProductCardProps) => {
     product?.meLiked?.[0]?.myFavorite ?? false,
   );
 
-  useEffect(() => {
-    setIsLiked(product?.meLiked?.[0]?.myFavorite ?? false);
-  }, [product?.meLiked]);
-
   const pushDetailHandler = async (productId: string) => {
     await router.push({
       pathname: "/products/productDetail",
