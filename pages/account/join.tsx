@@ -102,11 +102,17 @@ const Join: NextPage = () => {
               </Box>
               <Box className={"input-wrap"}>
                 <div className={"input-box"}>
-                  <span>Nickname</span>
+                  <span>
+                    {input.type === "AGENT" ? "Brand Name" : "Nickname"}
+                  </span>
                   <input
                     type="text"
                     value={input.nick}
-                    placeholder={"Enter Nickname"}
+                    placeholder={
+                      input.type === "AGENT"
+                        ? "Enter Brand Name"
+                        : "Enter Nickname"
+                    }
                     onChange={(e) => handleInput("nick", e.target.value)}
                     required={true}
                     onKeyDown={(event) => {

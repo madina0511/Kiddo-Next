@@ -71,6 +71,15 @@ const Products = ({ initialInput }: any) => {
   /** LIFECYCLES **/
   useEffect(() => {
     if (!router.isReady) return;
+    if (router.query.search) {
+      const updatedFilter = {
+        ...defaultFilter,
+        search: { text: router.query.search as string },
+      };
+      setSearchFilter(updatedFilter);
+      setCurrentPage(1);
+      return;
+    }
 
     if (router.query.input) {
       try {
@@ -86,7 +95,7 @@ const Products = ({ initialInput }: any) => {
     }
 
     setCurrentPage(searchFilter?.page ?? 1);
-  }, [router.isReady, router.query.input]);
+  }, [router.isReady, router.query.input, router.query.search]);
   useEffect(() => {
     setProductList(getProductsData?.getProducts?.list ?? []);
   }, [getProductsData]);

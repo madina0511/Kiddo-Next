@@ -17,6 +17,7 @@ import { NEXT_PUBLIC_API_URL } from "../config";
 import { sweetConfirmAlert } from "../types/sweetAlert";
 import CartDrawer from "./CartDrawer";
 import { GET_MY_CART } from "@/apollo/user/cart/query";
+import { GET_AGENTS } from "@/apollo/user/query";
 
 const Top = () => {
   const router = useRouter();
@@ -25,8 +26,12 @@ const Top = () => {
   const [logoutAnchor, setLogoutAnchor] = useState<null | HTMLElement>(null);
   const logoutOpen = Boolean(logoutAnchor);
   const [cartOpen, setCartOpen] = useState(false);
-  console.log(userVar());
+  const [searchText, setSearchText] = useState("");
+
   // Apollo
+  const { data: brandsData } = useQuery(GET_AGENTS, {
+    variables: { input: { page: 1, limit: 100, search: {} } },
+  });
   const { data: cartData } = useQuery(GET_MY_CART, {
     skip: !user?._id,
   });
@@ -45,7 +50,39 @@ const Top = () => {
       console.log("ERROR, logoutHandler:", err.message);
     }
   };
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return;
+    const value = searchText.trim().toLowerCase();
+    if (!value) return;
 
+    const pageRoutes: Record<string, string> = {
+      sets: "/sets",
+      brands: "/brands",
+      club: "/kiddo-club",
+      shop: "/products",
+    };
+    if (pageRoutes[value]) {
+      router.push(pageRoutes[value]);
+      return;
+    }
+
+    const brands = brandsData?.getAgents?.list ?? [];
+    const matched = brands.find(
+      (b: any) =>
+        b.brandName?.toLowerCase() === value ||
+        b.memberNick?.toLowerCase() === value,
+    );
+    if (matched) {
+      const slug = (matched.brandName || matched.memberNick)
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+      router.push(`/brand/${slug}`);
+      return;
+    }
+
+    router.push(`/products?search=${encodeURIComponent(searchText.trim())}`);
+    setSearchText("");
+  };
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -79,6 +116,9 @@ const Top = () => {
               className="searchInput"
               type="text"
               placeholder="Search products"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={handleSearch}
             />
             <SearchIcon style={{ color: "#6b7280", width: "18px" }} />
           </div>
