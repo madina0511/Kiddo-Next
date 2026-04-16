@@ -429,6 +429,7 @@ const CommunityDetail = ({ initialInput, ...props }: T) => {
                       <Stack className="icon-info">
                         {boardArticle?.memberId === user?._id && (
                           <IconButton
+                            sx={{ padding: 0 }}
                             onClick={() =>
                               deleteArticleHandler(boardArticle._id)
                             }>
