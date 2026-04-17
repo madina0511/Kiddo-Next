@@ -21,8 +21,6 @@ import { useReactiveVar } from "@apollo/client";
 import { userVar } from "@/apollo/store";
 import { useRouter } from "next/router";
 
-const user = useReactiveVar(userVar);
-const router = useRouter();
 interface Props {
   open: boolean;
   onClose: () => void;
