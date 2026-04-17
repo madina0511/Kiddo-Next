@@ -36,6 +36,7 @@ import { NEXT_PUBLIC_API_URL } from "@/libs/config";
 import { userVar } from "@/apollo/store";
 import { ADD_TO_CART } from "@/apollo/user/cart/mutation";
 import { GET_MY_CART } from "@/apollo/user/cart/query";
+import { sweetLoginConfirmAlert } from "@/libs/types/sweetAlert";
 
 const initialComment: CommentsInquiry = {
   page: 1,
@@ -231,8 +232,8 @@ const ProductDetail = () => {
   const addToCartHandler = async () => {
     if (!selectedProduct?._id) return;
     if (!user?._id) {
-      router.push("/account/join"); // yoki toast
-      return;
+      const confirm = await sweetLoginConfirmAlert("Please login first!");
+      if (confirm) router.push("/account/join");
     }
     if (!selectedSize) {
       alert("Please select size");

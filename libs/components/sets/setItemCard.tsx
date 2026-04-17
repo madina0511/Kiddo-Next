@@ -22,6 +22,10 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useRouter } from "next/router";
 import { userVar } from "@/apollo/store";
+import {
+  sweetLoginConfirmAlert,
+  sweetTopSmallSuccessAlert,
+} from "@/libs/types/sweetAlert";
 
 interface Props {
   itemId: string;
@@ -52,7 +56,8 @@ export default function SetItemCard({ itemId }: Props) {
   const handleAddToCart = async () => {
     if (!item || !selectedSize) return;
     if (!user?._id) {
-      router.push("/account/join"); // yoki toast
+      const confirm = await sweetLoginConfirmAlert("Please login first!");
+      if (confirm) router.push("/account/join");
       return;
     }
 
