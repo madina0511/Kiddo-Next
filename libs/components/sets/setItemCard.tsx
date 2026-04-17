@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useReactiveVar } from "@apollo/client";
 import { GET_PRODUCT } from "@/apollo/user/query";
 import { T } from "@/libs/common";
 import { Product } from "@/libs/types/product/product";
@@ -20,6 +20,8 @@ import { ADD_TO_CART } from "@/apollo/user/cart/mutation";
 import { GET_MY_CART } from "@/apollo/user/cart/query";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { useRouter } from "next/router";
+import { userVar } from "@/apollo/store";
 
 interface Props {
   itemId: string;
@@ -29,7 +31,8 @@ export default function SetItemCard({ itemId }: Props) {
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [item, setItem] = useState<Product | null>(null);
-
+  const user = useReactiveVar(userVar);
+  const router = useRouter();
   const { data: getProductData, loading: getProductLoading } = useQuery(
     GET_PRODUCT,
     {
@@ -42,10 +45,16 @@ export default function SetItemCard({ itemId }: Props) {
     setItem(getProductData?.getProduct ?? null);
   }, [getProductData]);
 
-  const [addToCart, { loading }] = useMutation(ADD_TO_CART);
+  const [addToCart, { loading }] = useMutation(ADD_TO_CART, {
+    refetchQueries: [{ query: GET_MY_CART }],
+  });
 
   const handleAddToCart = async () => {
     if (!item || !selectedSize) return;
+    if (!user?._id) {
+      router.push("/account/join"); // yoki toast
+      return;
+    }
 
     try {
       const res = await addToCart({

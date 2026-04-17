@@ -28,7 +28,7 @@ import {
   LIKE_TARGET_PRODUCT,
   UPDATE_COMMENT,
 } from "@/apollo/user/mutation";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
 import { GET_COMMENTS, GET_PRODUCT, GET_PRODUCTS } from "@/apollo/user/query";
 import { Product } from "@/libs/types/product/product";
 import { Direction } from "@/libs/enums/common.enum";
@@ -49,6 +49,7 @@ const initialComment: CommentsInquiry = {
 
 const ProductDetail = () => {
   const router = useRouter();
+  const user = useReactiveVar(userVar);
 
   const [productId, setProductId] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -229,7 +230,10 @@ const ProductDetail = () => {
 
   const addToCartHandler = async () => {
     if (!selectedProduct?._id) return;
-
+    if (!user?._id) {
+      router.push("/account/join"); // yoki toast
+      return;
+    }
     if (!selectedSize) {
       alert("Please select size");
       return;
