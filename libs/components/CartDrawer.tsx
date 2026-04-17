@@ -17,13 +17,20 @@ import { UPDATE_CART, REMOVE_CART_ITEM } from "@/apollo/user/cart/mutation";
 import styles from "@/scss/pc/layout/CartDrawer.module.scss";
 import { GET_MY_CART } from "@/apollo/user/cart/query";
 import { Cart, CartItem } from "../types/cart/cart";
+import { useReactiveVar } from "@apollo/client";
+import { userVar } from "@/apollo/store";
+import { useRouter } from "next/router";
 
+const user = useReactiveVar(userVar);
+const router = useRouter();
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
 export default function CartDrawer({ open, onClose }: Props) {
+  const user = useReactiveVar(userVar);
+  const router = useRouter();
   const { data, loading } = useQuery<{ getMyCart: Cart }>(GET_MY_CART, {
     skip: !open,
     fetchPolicy: "network-only",
@@ -102,7 +109,14 @@ export default function CartDrawer({ open, onClose }: Props) {
       console.error("REMOVE CART ITEM ERROR:", err);
     }
   };
-
+  const handleCheckout = () => {
+    if (!user?._id) {
+      router.push("/account/join");
+      onClose();
+      return;
+    }
+    router.push("/checkout");
+  };
   return (
     <Drawer
       anchor="right"
@@ -247,7 +261,10 @@ export default function CartDrawer({ open, onClose }: Props) {
             </Typography>
           </Stack>
 
-          <Button fullWidth className={styles.checkoutBtn}>
+          <Button
+            fullWidth
+            className={styles.checkoutBtn}
+            onClick={handleCheckout}>
             CONTINUE TO CHECKOUT
           </Button>
         </Box>

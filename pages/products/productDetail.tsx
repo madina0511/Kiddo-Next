@@ -78,39 +78,6 @@ const ProductDetail = () => {
     awaitRefetchQueries: true,
   });
 
-  useEffect(() => {
-    const id = router.query.id as string | undefined;
-    if (!id) return;
-    setProductId(id);
-  }, [router.query.id]);
-
-  const { loading: getProductLoading, data: productData } = useQuery(
-    GET_PRODUCT,
-    {
-      fetchPolicy: "network-only",
-      variables: { input: productId },
-      skip: !productId,
-      notifyOnNetworkStatusChange: true,
-    },
-  );
-
-  useEffect(() => {
-    const fetchedProduct = productData?.getProduct;
-    if (!fetchedProduct) return;
-
-    setSelectedProduct(fetchedProduct);
-
-    setCommentInquiry((prev) => ({
-      ...prev,
-      search: { ...(prev.search ?? {}), commentRefId: fetchedProduct._id },
-    }));
-
-    setInsertCommentData((prev) => ({
-      ...prev,
-      commentRefId: fetchedProduct._id,
-    }));
-  }, [productData]);
-
   const { data: getProductsData, refetch: getProductsRefetch } = useQuery(
     GET_PRODUCTS,
     {
@@ -138,6 +105,38 @@ const ProductDetail = () => {
       notifyOnNetworkStatusChange: true,
     },
   );
+  const { loading: getProductLoading, data: productData } = useQuery(
+    GET_PRODUCT,
+    {
+      fetchPolicy: "network-only",
+      variables: { input: productId },
+      skip: !productId,
+      notifyOnNetworkStatusChange: true,
+    },
+  );
+
+  useEffect(() => {
+    const id = router.query.id as string | undefined;
+    if (!id) return;
+    setProductId(id);
+  }, [router.query.id]);
+
+  useEffect(() => {
+    const fetchedProduct = productData?.getProduct;
+    if (!fetchedProduct) return;
+
+    setSelectedProduct(fetchedProduct);
+
+    setCommentInquiry((prev) => ({
+      ...prev,
+      search: { ...(prev.search ?? {}), commentRefId: fetchedProduct._id },
+    }));
+
+    setInsertCommentData((prev) => ({
+      ...prev,
+      commentRefId: fetchedProduct._id,
+    }));
+  }, [productData]);
 
   useEffect(() => {
     if (!commentsData) return;
@@ -231,15 +230,10 @@ const ProductDetail = () => {
 
   const addToCartHandler = async () => {
     if (!selectedProduct?._id) return;
-    if (!user?._id) {
-      const confirm = await sweetLoginConfirmAlert("Please login first!");
-      if (confirm) router.push("/account/join");
-    }
     if (!selectedSize) {
       alert("Please select size");
       return;
     }
-
     try {
       const variables = {
         input: {
@@ -249,17 +243,12 @@ const ProductDetail = () => {
         },
       };
 
-      console.log("ADD TO CART VARIABLES:", variables);
-
       const res = await addToCart({ variables });
-      console.log("ADD TO CART SUCCESS:", res);
 
       setSelectedSize("");
       setSelectedColor("");
     } catch (err: any) {
       console.error("ADD TO CART ERROR:", err);
-      console.error("GRAPHQL ERRORS:", err?.graphQLErrors);
-      console.error("FIRST ERROR:", err?.graphQLErrors?.[0]);
     }
   };
 

@@ -55,11 +55,6 @@ export default function SetItemCard({ itemId }: Props) {
 
   const handleAddToCart = async () => {
     if (!item || !selectedSize) return;
-    if (!user?._id) {
-      const confirm = await sweetLoginConfirmAlert("Please login first!");
-      if (confirm) router.push("/account/join");
-      return;
-    }
 
     try {
       const res = await addToCart({
@@ -71,12 +66,8 @@ export default function SetItemCard({ itemId }: Props) {
           },
         },
       });
-
-      console.log("SUCCESS:", res);
     } catch (err: any) {
       console.error("ADD TO CART ERR:", err);
-      console.error("GRAPHQL ERRORS:", err?.graphQLErrors);
-      console.error("NETWORK ERROR:", err?.networkError);
     }
   };
 
