@@ -91,14 +91,14 @@ const AdminMenuList = (props: any) => {
       on_click: () => subMenuChangeHandler("Users"),
     },
     {
-      title: "Properties",
+      title: "Products",
       icon: <UserCircleGear size={20} color="#bdbdbd" weight="fill" />,
       on_click: () => subMenuChangeHandler("Products"),
     },
     {
-      title: "Community",
+      title: "Kiddo club",
       icon: <ChatsCircle size={20} color="#bdbdbd" weight="fill" />,
-      on_click: () => subMenuChangeHandler("Community"),
+      on_click: () => subMenuChangeHandler("Kiddo club"),
     },
     {
       title: "Cs",
@@ -108,9 +108,9 @@ const AdminMenuList = (props: any) => {
   ];
 
   const sub_menu_set: any = {
-    Users: [{ title: "List", url: "/_admin/users" }],
-    Properties: [{ title: "List", url: "/_admin/products" }],
-    Community: [{ title: "List", url: "/_admin/kiddo-club" }],
+    Users: [{ title: "List", url: "/_admin/user" }],
+    Products: [{ title: "List", url: "/_admin/products" }],
+    "Kiddo club": [{ title: "List", url: "/_admin/kiddo-club" }],
     Cs: [
       { title: "FAQ", url: "/_admin/cs/faq" },
       { title: "Notice", url: "/_admin/cs/notice" },
