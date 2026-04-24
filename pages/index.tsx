@@ -27,9 +27,11 @@ const Home: NextPage = () => {
     return (
       <Stack className={"home-page"}>
         <div className="hero-video">
-          <video autoPlay muted loop playsInline>
-            <source src="/img/banner/hero.mp4" type="video/mp4" />
-          </video>
+          <div className="hero-video">
+            <video autoPlay muted loop playsInline>
+              <source src="/img/banner/hero.mp4" type="video/mp4" />
+            </video>
+          </div>
         </div>
         <NewArrivals />
         <ProductSwiper />
