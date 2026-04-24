@@ -113,7 +113,7 @@ export default function CartDrawer({ open, onClose }: Props) {
       onClose();
       return;
     }
-    router.push("/checkout");
+    onClose();
   };
   return (
     <Drawer

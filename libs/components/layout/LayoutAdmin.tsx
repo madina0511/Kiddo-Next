@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import { Menu, MenuItem, MenuList } from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
@@ -19,6 +19,7 @@ import { userVar } from "../../../apollo/store";
 
 import { MemberType } from "../../enums/member.enum";
 import { NEXT_PUBLIC_API_URL } from "@/libs/config";
+import AdminMenuList from "../admin/AdminMenuList";
 const drawerWidth = 280;
 interface AdminPageProps {
   setSnackbar: React.Dispatch<
@@ -192,7 +193,7 @@ const withAdminLayout = (Component: ComponentType<AdminPageProps>) => {
 
             <Divider />
 
-            <MenuList />
+            <AdminMenuList />
           </Drawer>
 
           <Box component={"div"} id="bunker" sx={{ flexGrow: 1 }}>
