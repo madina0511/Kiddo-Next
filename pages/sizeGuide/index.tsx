@@ -7,7 +7,7 @@ import {
   AGE_GROUP_LABELS,
   CLOTHING_SIZE_LABELS,
 } from "@/libs/enums/product.enum";
-import styles from "../../scss/pc/sizeGuide/Sizeguidepage.module.scss";
+import styles from "../../scss/pc/sizeGuide/SizeGuidePage.module.scss";
 
 interface SizeRow {
   ageGroup: AgeGroup;
