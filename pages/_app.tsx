@@ -1,6 +1,6 @@
 import type { AppProps } from "next/app";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useApollo } from "../apollo/client";
 import { CssBaseline } from "@mui/material";
 import { light } from "../scss/MaterialTheme";
@@ -37,11 +37,14 @@ export default function App({ Component, pageProps }: AppProps) {
   const client = useApollo(pageProps.initialApolloState);
   // Socket. io, Redux, Mui ...
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </ApolloProvider>
+    <GoogleOAuthProvider
+      clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}>
+      <ApolloProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </ApolloProvider>
+    </GoogleOAuthProvider>
   );
 }

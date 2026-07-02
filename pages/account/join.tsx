@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { NextPage } from "next";
 import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
-
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLogIn } from "../../libs/auth";
 import {
   Box,
   Button,
@@ -235,6 +236,25 @@ const Join: NextPage = () => {
                     SIGNUP
                   </Button>
                 )}
+              </Box>
+              <Box
+                className={"google-login"}
+                sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    try {
+                      if (credentialResponse.credential) {
+                        await googleLogIn(credentialResponse.credential);
+                        await router.push(`${router.query.referrer ?? "/"}`);
+                      }
+                    } catch (err) {
+                      console.log("Google login error:", err);
+                    }
+                  }}
+                  onError={() => {
+                    console.log("Google Login Failed");
+                  }}
+                />
               </Box>
               <Box className={"ask-info"}>
                 {loginView ? (

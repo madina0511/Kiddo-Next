@@ -2,8 +2,10 @@ import { initializeApollo } from "@/apollo/client";
 import { sweetMixinErrorAlert } from "../types/sweetAlert";
 import { CustomJwtPayload } from "../types/customJwtPayload";
 import { userVar } from "@/apollo/store";
-import { LOGIN, SIGN_UP } from "@/apollo/user/mutation";
+
 import jwtDecode from "jwt-decode";
+import { GOOGLE_LOGIN, LOGIN, SIGN_UP } from "@/apollo/user/mutation";
+
 export function getJwtToken(): any {
   if (typeof window !== "undefined") {
     return localStorage.getItem("accessToken") ?? "";
@@ -134,6 +136,45 @@ const requestSignUpJwtToken = async ({
         await sweetMixinErrorAlert("User has been blocked!");
         break;
     }
+    throw new Error("token error");
+  }
+};
+
+export const googleLogIn = async (idToken: string): Promise<void> => {
+  try {
+    const { jwtToken } = await requestGoogleJwtToken({ idToken });
+
+    if (jwtToken) {
+      updateStorage({ jwtToken });
+      updateUserInfo(jwtToken);
+    }
+  } catch (err) {
+    console.warn("google login err", err);
+    logOut();
+  }
+};
+
+const requestGoogleJwtToken = async ({
+  idToken,
+}: {
+  idToken: string;
+}): Promise<{ jwtToken: string }> => {
+  const apolloClient = await initializeApollo();
+
+  try {
+    const result = await apolloClient.mutate({
+      mutation: GOOGLE_LOGIN,
+      variables: { input: { idToken } },
+      fetchPolicy: "network-only",
+    });
+
+    console.log("---------- google login ----------");
+    const { accessToken } = result?.data?.googleLogin;
+
+    return { jwtToken: accessToken };
+  } catch (err: any) {
+    console.log("google login err", err.graphQLErrors);
+    await sweetMixinErrorAlert("Google login failed, please try again");
     throw new Error("token error");
   }
 };

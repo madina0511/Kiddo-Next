@@ -104,6 +104,10 @@ const TuiEditor = () => {
 
   const handleRegisterButton = async () => {
     try {
+      if (!token) {
+        await sweetErrorHandling(new Error(Message.NOT_AUTHENTICATED));
+        return;
+      }
       const editor = editorRef.current;
       const articleContent = editor?.getInstance().getHTML() as string;
       memoizedValues.articleContent = articleContent;
