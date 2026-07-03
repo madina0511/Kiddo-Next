@@ -60,7 +60,13 @@ const Join: NextPage = () => {
       await router.push(`${router.query.referrer ?? "/"}`);
     } catch (err: any) {
       console.log("login error:", err);
-      await sweetMixinErrorAlert(err.message);
+
+      const message =
+        err?.message ||
+        err?.response?.data?.message ||
+        "ID or password is incorrect. Please check again.";
+
+      await sweetMixinErrorAlert(message);
     }
   };
   const doSignUp = async () => {

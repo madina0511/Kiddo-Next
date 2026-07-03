@@ -10,6 +10,7 @@ import "../scss/pc/main.scss";
 
 import { ApolloProvider } from "@apollo/client";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+import AiChatWidget from "@/libs/components/ai-assistant/AiChatWidget";
 
 // Next.js sets this automatically, but we can check if it's NOT production
 const isDev = process.env.NODE_ENV !== "production";
@@ -43,6 +44,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Component {...pageProps} />
+          <AiChatWidget />
         </ThemeProvider>
       </ApolloProvider>
     </GoogleOAuthProvider>
