@@ -4,7 +4,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useApollo } from "../apollo/client";
 import { CssBaseline } from "@mui/material";
 import { light } from "../scss/MaterialTheme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../scss/app.scss";
 import "../scss/pc/main.scss";
 
@@ -36,6 +36,32 @@ export default function App({ Component, pageProps }: AppProps) {
   //@ts-ignore
   const [theme, setTheme] = useState(createTheme(light));
   const client = useApollo(pageProps.initialApolloState);
+
+  // _app.tsx ichida, App komponentida
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const message = event.reason?.message || "";
+      const code = event.reason?.code || "";
+
+      // Toss to'lov bekor qilish xatolarini bosib qo'yamiz
+      if (
+        code === "USER_CANCEL" ||
+        code === "PAY_PROCESS_CANCELED" ||
+        message.includes("취소")
+      ) {
+        event.preventDefault(); // Next.js overlay'ga chiqishini to'xtatadi
+        console.log("Payment cancelled by user");
+      }
+    };
+
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    return () =>
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
+  }, []);
+
   // Socket. io, Redux, Mui ...
   return (
     <GoogleOAuthProvider

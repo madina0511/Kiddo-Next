@@ -49,8 +49,15 @@ const PaymentPage = () => {
       });
     } catch (err: any) {
       console.error("TOSS PAYMENT ERROR:", err);
-      if (err?.code !== "USER_CANCEL") {
+      const isCancelled =
+        err?.code === "USER_CANCEL" ||
+        err?.code === "PAY_PROCESS_CANCELED" ||
+        err?.message?.includes("취소");
+
+      if (!isCancelled) {
         setError(err?.message || "Payment failed to start.");
+      } else {
+        router.push("/order/checkout"); // foydalanuvchi qayerdan kelgan bo'lsa, o'sha yerga qaytaradi
       }
       setLoading(false);
     }
