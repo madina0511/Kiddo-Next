@@ -39,19 +39,41 @@
     display: flex;
     flex-direction: row;
     background: #181a20;
+
+    @media (max-width: 767px) {
+      padding: 40px 20px 18px 20px;
+    }
+
     .footer-container {
       width: 1300px;
       height: auto;
       margin: 0 auto;
+
+      @media (max-width: 767px) {
+        width: 100%;
+      }
+
       .main {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+
+        @media (max-width: 767px) {
+          flex-direction: column;
+          gap: 32px;
+        }
+
         .left {
           height: 360px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+
+          @media (max-width: 767px) {
+            height: auto;
+            gap: 24px;
+          }
+
           .footer-box {
             display: flex;
             flex-direction: column;
@@ -84,6 +106,11 @@
                 font-size: 32px;
                 margin-right: 22px;
                 cursor: pointer;
+
+                @media (max-width: 767px) {
+                  font-size: 26px;
+                  margin-right: 16px;
+                }
               }
             }
           }
@@ -114,6 +141,13 @@
               box-sizing: border-box;
               border-radius: 12px;
               background: #212329;
+
+              @media (max-width: 767px) {
+                width: 100%;
+                padding: 16px 20px;
+                height: 56px;
+              }
+
               input {
                 margin-right: 10px;
                 width: 85%;
@@ -143,6 +177,13 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
+
+            @media (max-width: 767px) {
+              margin-top: 0;
+              flex-direction: column;
+              gap: 24px;
+            }
+
             div {
               display: flex;
               flex-direction: column;
@@ -164,6 +205,11 @@
                 font-style: normal;
                 font-weight: 400;
                 cursor: pointer;
+
+                @media (max-width: 767px) {
+                  margin-top: 14px;
+                }
+
                 &:hover {
                   color: #ffffff;
                   text-decoration-line: underline;
@@ -181,6 +227,17 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: flex-end;
+
+        @media (max-width: 767px) {
+          margin-top: 32px;
+          height: auto;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          padding-top: 16px;
+          padding-bottom: 8px;
+        }
+
         span {
           color: #bebdbd;
           font-family: inherit;

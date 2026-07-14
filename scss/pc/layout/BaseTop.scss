@@ -35,7 +35,7 @@
           display: none;
           align-items: center;
           gap: 40px;
-          @media (min-width: 640px) {
+          @media (min-width: 768px) {
             & {
               display: flex;
             }
@@ -47,12 +47,6 @@
             height: 100%;
             .megaLabel {
               cursor: pointer;
-
-              // font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-              // font-size: 16px;
-              // font-weight: 400;
-              // letter-spacing: inherit;
-              // color: #212121;
               user-select: none;
               &.isOpen {
                 opacity: 0.7;
@@ -167,7 +161,18 @@
         }
       }
 
-      /* Mobile menu button */
+      /* Mobile actions row (cart + hamburger) */
+      .mobileActions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      @media (min-width: 768px) {
+        .mobileActions {
+          display: none;
+        }
+      }
+
       .mobileMenuBtn {
         display: inline-flex;
         align-items: center;
@@ -175,11 +180,7 @@
         border: none;
         background: transparent;
         cursor: pointer;
-      }
-      @media (min-width: 640px) {
-        .mobileMenuBtn {
-          display: none; /* sm:hidden */
-        }
+        padding: 8px;
       }
 
       /* Mobile dropdown */

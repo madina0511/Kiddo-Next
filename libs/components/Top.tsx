@@ -7,6 +7,8 @@ import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Logout from "@mui/icons-material/Logout";
 import Link from "next/link";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 
 import MegaMenuPopper from "./MegaMenuPopper";
 import BrandMenuPopper from "./brands/MegaMenuPopper";
@@ -30,6 +32,7 @@ const Top = () => {
   const logoutOpen = Boolean(logoutAnchor);
   const [scrolled, setScrolled] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Apollo
   const { data: brandsData } = useQuery(GET_AGENTS, {
@@ -49,7 +52,6 @@ const Top = () => {
       const isHomePage = router.pathname === "/";
 
       if (isHomePage) {
-        console.log("scrollY:", window.scrollY);
         const heroHeight = window.innerHeight;
         setScrolled(window.scrollY > heroHeight - 80);
       } else {
@@ -109,7 +111,7 @@ const Top = () => {
   const handleClose = () => setOpen(false);
 
   return (
-    <nav className={`topNav ${scrolled ? "scrolled" : ""}`}>
+    <nav className={`topNav ${scrolled || mobileOpen ? "scrolled" : ""}`}>
       <Stack className="container">
         {/* logo */}
         <Stack className="topNav-logo">
@@ -160,7 +162,6 @@ const Top = () => {
                 <ShoppingCartOutlinedIcon />
               </Badge>
             </IconButton>
-            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
           </div>
 
           {/* ✅ USER BOX (Login/Register yoki Avatar+Logout) */}
@@ -206,6 +207,90 @@ const Top = () => {
             )}
           </Box>
         </div>
+
+        <div className="mobileActions">
+          <IconButton onClick={() => setCartOpen(true)}>
+            <Badge
+              badgeContent={cartData?.getMyCart?.items?.length || 0}
+              sx={{
+                "& .MuiBadge-badge": {
+                  backgroundColor: "#6b7280",
+                  color: "#fff",
+                },
+              }}>
+              <ShoppingCartOutlinedIcon />
+            </Badge>
+          </IconButton>
+
+          <button
+            className="mobileMenuBtn"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Menu">
+            {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
+
+        {mobileOpen && (
+          <div className="mobileMenu">
+            <Link
+              className="mobileLink"
+              href="/products"
+              onClick={() => setMobileOpen(false)}>
+              Shop
+            </Link>
+            <Link
+              className="mobileLink"
+              href="/sets"
+              onClick={() => setMobileOpen(false)}>
+              Sets
+            </Link>
+            <Link
+              className="mobileLink"
+              href="/brands"
+              onClick={() => setMobileOpen(false)}>
+              Brands
+            </Link>
+            <Link
+              className="mobileLink"
+              href="/kiddo-club"
+              onClick={() => setMobileOpen(false)}>
+              Kiddo Club
+            </Link>
+            <Link
+              className="mobileLink"
+              href="/sizeGuide"
+              onClick={() => setMobileOpen(false)}>
+              SizeGuide
+            </Link>
+            {user?._id ? (
+              <>
+                <Link
+                  className="mobileLink"
+                  href={user.memberType === "ADMIN" ? "/_admin" : "/mypage"}
+                  onClick={() => setMobileOpen(false)}>
+                  My Page
+                </Link>
+                <span
+                  className="mobileLink"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    logoutHandler();
+                  }}>
+                  Logout
+                </span>
+              </>
+            ) : (
+              <Link
+                className="mobileLoginBtn"
+                href="/account/join"
+                onClick={() => setMobileOpen(false)}>
+                Login
+              </Link>
+            )}
+          </div>
+        )}
+
+        <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       </Stack>
     </nav>
   );

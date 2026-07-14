@@ -31,7 +31,8 @@
     opacity: 0.9;
 
     a,
-    .megaLabel {
+    .megaLabel,
+    .mobileActions {
       color: #212121;
     }
 
@@ -70,7 +71,7 @@
       display: none;
       align-items: center;
       gap: 40px;
-      @media (min-width: 640px) {
+      @media (min-width: 768px) {
         & {
           display: flex;
         }
@@ -202,7 +203,24 @@
     }
   }
 
-  /* Mobile menu button */
+  /* Mobile actions row (cart + hamburger) */
+  .mobileActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+
+    .MuiIconButton-root,
+    .mobileMenuBtn {
+      color: inherit;
+    }
+  }
+  @media (min-width: 768px) {
+    .mobileActions {
+      display: none;
+    }
+  }
+
   .mobileMenuBtn {
     display: inline-flex;
     align-items: center;
@@ -210,11 +228,7 @@
     border: none;
     background: transparent;
     cursor: pointer;
-  }
-  @media (min-width: 640px) {
-    .mobileMenuBtn {
-      display: none; /* sm:hidden */
-    }
+    padding: 8px;
   }
 
   /* Mobile dropdown */

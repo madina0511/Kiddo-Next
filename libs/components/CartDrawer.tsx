@@ -30,7 +30,7 @@ export default function CartDrawer({ open, onClose }: Props) {
   const user = useReactiveVar(userVar);
   const router = useRouter();
   const { data, loading } = useQuery<{ getMyCart: Cart }>(GET_MY_CART, {
-    skip: !open,
+    skip: !open || !user?._id,
     fetchPolicy: "network-only",
   });
 
@@ -68,13 +68,6 @@ export default function CartDrawer({ open, onClose }: Props) {
     if (newQty === currentQty) return;
 
     try {
-      console.log("UPDATE VARIABLES:", {
-        input: {
-          _id: String(id),
-          quantity: newQty,
-        },
-      });
-
       const res = await updateCartItem({
         variables: {
           input: {
@@ -85,8 +78,6 @@ export default function CartDrawer({ open, onClose }: Props) {
         refetchQueries: [{ query: GET_MY_CART }],
         awaitRefetchQueries: true,
       });
-
-      console.log("UPDATE RESULT:", res);
     } catch (err: any) {
       console.error("UPDATE CART ERROR:", err);
       console.error("GRAPHQL ERRORS:", err?.graphQLErrors);
@@ -113,6 +104,7 @@ export default function CartDrawer({ open, onClose }: Props) {
       onClose();
       return;
     }
+    router.push("/order/checkout");
     onClose();
   };
   return (
@@ -152,7 +144,11 @@ export default function CartDrawer({ open, onClose }: Props) {
         <Divider />
 
         <Box className={styles.itemList}>
-          {loading ? (
+          {!user?._id ? (
+            <Typography className={styles.empty}>
+              Please log in to view your cart
+            </Typography>
+          ) : loading ? (
             <Stack alignItems="center" mt={4}>
               <CircularProgress size={24} />
             </Stack>
